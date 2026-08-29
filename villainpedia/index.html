@@ -181,7 +181,9 @@ const PHOTO_BUCKET = "character-photos";
 const AUDIO_BUCKET = "character-audio";
 // ============================================================
 
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  global: { headers: { apikey: SUPABASE_ANON_KEY } }
+});
 
 let currentUser = null;
 let isAdmin = false;
