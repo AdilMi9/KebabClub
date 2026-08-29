@@ -38,7 +38,7 @@
   .brand{font-family:'IBM Plex Mono', monospace;font-size:12px;letter-spacing:.12em;color:var(--muted);text-decoration:none;}
   .brand b{color:var(--accent-teal);}
   .auth-box{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-  .auth-box input[type=email], .auth-box input[type=password]{
+  .auth-box input[type=email]{
     background:var(--bg-soft);border:1px solid var(--border);color:var(--text);
     font-family:'IBM Plex Mono', monospace;font-size:12px;padding:8px 10px;width:190px;
   }
@@ -241,36 +241,6 @@ function renderAuthBox(){
       hint.textContent = 'account created — logging you in…';
       await refreshAuth();
       route();
-    });
-  } else {
-    authBoxEl.innerHTML = `
-      <span class="who">${esc(currentUser.email)}${isAdmin ? ' · ADMIN' : ''}</span>
-      ${isAdmin ? '<a class="btn" href="index.html?new=1">+ New character</a>' : ''}
-      <button class="btn danger" id="signOutBtn">Sign out</button>
-    `;
-    document.getElementById('signOutBtn').addEventListener('click', async ()=>{
-      await sb.auth.signOut();
-      await refreshAuth();
-      route();
-    });
-  }
-}
-  if(!currentUser){
-    authBoxEl.innerHTML = `
-      <input type="email" id="loginEmail" placeholder="you@email.com">
-      <button class="btn" id="sendLinkBtn">Sign in</button>
-      <span class="who" id="loginHint"></span>
-    `;
-    document.getElementById('sendLinkBtn').addEventListener('click', async ()=>{
-      const email = document.getElementById('loginEmail').value.trim();
-      const hint = document.getElementById('loginHint');
-      if(!email){ hint.textContent = 'enter an email'; return; }
-      hint.textContent = 'sending…';
-      const { error } = await sb.auth.signInWithOtp({
-        email,
-        options: { emailRedirectTo: location.origin + location.pathname + location.search }
-      });
-      hint.textContent = error ? 'error — try again' : 'check your email';
     });
   } else {
     authBoxEl.innerHTML = `
