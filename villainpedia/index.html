@@ -38,7 +38,7 @@
   .brand{font-family:'IBM Plex Mono', monospace;font-size:12px;letter-spacing:.12em;color:var(--muted);text-decoration:none;}
   .brand b{color:var(--accent-teal);}
   .auth-box{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
-  .auth-box input[type=email]{
+  .auth-box input[type=email], .auth-box input[type=password]{
     background:var(--bg-soft);border:1px solid var(--border);color:var(--text);
     font-family:'IBM Plex Mono', monospace;font-size:12px;padding:8px 10px;width:190px;
   }
@@ -207,6 +207,54 @@ async function refreshAuth(){
 }
 
 function renderAuthBox(){
+  if(!currentUser){
+    authBoxEl.innerHTML = `
+      <input type="email" id="loginEmail" placeholder="you@email.com">
+      <input type="password" id="loginPassword" placeholder="password">
+      <button class="btn" id="loginBtn">Log in</button>
+      <button class="btn" id="signupBtn">Sign up</button>
+      <span class="who" id="loginHint"></span>
+    `;
+    const emailEl = document.getElementById('loginEmail');
+    const passEl = document.getElementById('loginPassword');
+    const hint = document.getElementById('loginHint');
+
+    document.getElementById('loginBtn').addEventListener('click', async ()=>{
+      const email = emailEl.value.trim();
+      const password = passEl.value;
+      if(!email || !password){ hint.textContent = 'enter email and password'; return; }
+      hint.textContent = 'logging in…';
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if(error){ hint.textContent = error.message; return; }
+      await refreshAuth();
+      route();
+    });
+
+    document.getElementById('signupBtn').addEventListener('click', async ()=>{
+      const email = emailEl.value.trim();
+      const password = passEl.value;
+      if(!email || !password){ hint.textContent = 'enter email and password'; return; }
+      if(password.length < 6){ hint.textContent = 'password must be at least 6 characters'; return; }
+      hint.textContent = 'creating account…';
+      const { error } = await sb.auth.signUp({ email, password });
+      if(error){ hint.textContent = error.message; return; }
+      hint.textContent = 'account created — logging you in…';
+      await refreshAuth();
+      route();
+    });
+  } else {
+    authBoxEl.innerHTML = `
+      <span class="who">${esc(currentUser.email)}${isAdmin ? ' · ADMIN' : ''}</span>
+      ${isAdmin ? '<a class="btn" href="index.html?new=1">+ New character</a>' : ''}
+      <button class="btn danger" id="signOutBtn">Sign out</button>
+    `;
+    document.getElementById('signOutBtn').addEventListener('click', async ()=>{
+      await sb.auth.signOut();
+      await refreshAuth();
+      route();
+    });
+  }
+}
   if(!currentUser){
     authBoxEl.innerHTML = `
       <input type="email" id="loginEmail" placeholder="you@email.com">
