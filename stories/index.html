@@ -151,27 +151,6 @@ const REACTIONS = [
 ];
 const TAGS = ['LEGEND','FAIL','CRINGE','EPIC'];
 
-// ============================================================
-// FEATURED — самостоятельные html-страницы (не из Supabase).
-// Открываются в новой вкладке по прямой ссылке.
-// Добавь сюда объект, чтобы прикрепить ещё одну такую страницу.
-// ============================================================
-const FEATURED = [
-  {
-    tag: 'CHRONICLE',
-    author: 'Royal Scribe',
-    preview: 'The Chronicle of Mustachestan — the full illuminated saga of pigeons, kebab, and one truly magnificent mustache.',
-    url: 'chronicle-of-mustachestan.html'
-  },
-  {
-    tag: 'CHRONICLE',
-    author: 'Royal Scribe',
-    preview: 'The Grand Mustachestan Pokémon Championship — the full account of the tournament.',
-    url: 'pokemon-championship.html'
-  }
-];
-// ============================================================
-
 let currentUser = null;
 let isAdmin = false;
 let selectedTag = 'LEGEND';
@@ -258,6 +237,11 @@ async function fetchComments(storyId){
   if(error) throw error;
   return data;
 }
+async function fetchFeatured(){
+  const { data, error } = await sb.from('featured_pages').select('*').order('created_at', {ascending:false});
+  if(error) throw error;
+  return data;
+}
 async function uploadFile(file){
   const path = `${Date.now()}-${Math.random().toString(36).slice(2,8)}-${file.name}`;
   const { error } = await sb.storage.from(BUCKET).upload(path, file);
@@ -292,7 +276,8 @@ async function renderList(){
   document.getElementById('countLabel').textContent = stories.length + (stories.length===1?' entry':' entries');
   const feedEl = document.getElementById('feed');
 
-  const featuredHtml = FEATURED.map(f => `
+  const featured = await fetchFeatured().catch(()=>[]);
+  const featuredHtml = featured.map(f => `
     <a class="story-card" href="${f.url}" target="_blank" rel="noopener">
       <div class="thumb"></div>
       <div class="body">
@@ -305,7 +290,7 @@ async function renderList(){
     </a>
   `).join('');
 
-  if(stories.length === 0 && FEATURED.length === 0){ feedEl.innerHTML = '<div class="empty">Nothing logged yet.</div>'; return; }
+  if(stories.length === 0 && featured.length === 0){ feedEl.innerHTML = '<div class="empty">Nothing logged yet.</div>'; return; }
   if(stories.length === 0){ feedEl.innerHTML = featuredHtml; return; }
 
   const total = stories.length;

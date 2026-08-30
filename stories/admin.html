@@ -78,6 +78,11 @@
 
   .login-prompt{font-family:'IBM Plex Mono', monospace;font-size:12.5px;color:var(--muted);border:1px dashed var(--border);padding:16px;}
   .error{color:var(--accent-red);font-family:'IBM Plex Mono', monospace;font-size:13px;border:1px dashed var(--accent-red);padding:16px;}
+  .featured-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;background:var(--paper);color:var(--ink);padding:14px 16px;border:1px solid var(--paper-shadow);margin-bottom:8px;}
+  .featured-row .meta{font-family:'IBM Plex Mono', monospace;font-size:11px;color:#7A6F62;margin-bottom:4px;}
+  .featured-row p{margin:0;font-size:13.5px;}
+  .featured-row .del-btn{font-family:'IBM Plex Mono', monospace;font-size:11px;background:var(--accent-red);color:#fff;border:none;padding:5px 10px;cursor:pointer;flex:none;}
+  .featured-row .del-btn:hover{filter:brightness(1.1);}
 </style>
 </head>
 <body>
@@ -204,6 +209,21 @@ function renderApp(){
       <button class="submit-btn" id="submitBtn">Log this story →</button>
       <div class="form-hint" id="formHint"></div>
     </div>
+
+    <h1 class="title" style="font-size:clamp(24px,5vw,34px);margin-top:44px;">Featured pages</h1>
+    <p class="subtitle">Standalone HTML pages (like the Chronicle) that show up as pinned cards in the feed.</p>
+    <div class="panel">
+      <h2>Add a page</h2>
+      <label class="field-label">File name (must match the uploaded .html file exactly)</label>
+      <input type="text" id="fUrl" placeholder="e.g. pokemon-championship.html">
+      <label class="field-label">Card label / author line</label>
+      <input type="text" id="fAuthor" value="Royal Scribe">
+      <label class="field-label">Preview text</label>
+      <textarea id="fPreview" placeholder="Short description shown on the card…"></textarea>
+      <button class="submit-btn" id="addFeaturedBtn">Add page →</button>
+      <div class="form-hint" id="featuredHint"></div>
+    </div>
+    <div id="featuredList" style="margin-top:16px;"></div>
   `;
 
   document.getElementById('tagRow').querySelectorAll('.tag-btn').forEach(btn=>{
@@ -240,6 +260,63 @@ function renderApp(){
 
   renderPendingFiles();
   document.getElementById('submitBtn').addEventListener('click', handleSubmit);
+
+  document.getElementById('addFeaturedBtn').addEventListener('click', handleAddFeatured);
+  renderFeaturedList();
+}
+
+async function renderFeaturedList(){
+  const el = document.getElementById('featuredList');
+  if(!el) return;
+  el.innerHTML = '<div class="who">loading…</div>';
+  try{
+    const { data, error } = await sb.from('featured_pages').select('*').order('created_at', {ascending:false});
+    if(error) throw error;
+    el.innerHTML = data.length ? data.map(f => `
+      <div class="featured-row" data-id="${f.id}">
+        <div>
+          <div class="meta">${esc(f.tag)} · ${esc(f.author)} · ${esc(f.url)}</div>
+          <p>${esc(f.preview)}</p>
+        </div>
+        <button class="del-btn" data-id="${f.id}">✕ Remove</button>
+      </div>
+    `).join('') : '<div class="who">No featured pages yet.</div>';
+    el.querySelectorAll('.del-btn').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if(!confirm('Remove this featured page from the feed? (the .html file itself stays on the server)')) return;
+        await sb.from('featured_pages').delete().eq('id', btn.dataset.id);
+        renderFeaturedList();
+      });
+    });
+  }catch(e){
+    console.error(e);
+    el.innerHTML = '<div class="error">Could not load featured pages — make sure the featured_pages table exists.</div>';
+  }
+}
+
+async function handleAddFeatured(){
+  const urlEl = document.getElementById('fUrl');
+  const authorEl = document.getElementById('fAuthor');
+  const previewEl = document.getElementById('fPreview');
+  const btn = document.getElementById('addFeaturedBtn');
+  const hint = document.getElementById('featuredHint');
+  const url = urlEl.value.trim();
+  const author = authorEl.value.trim() || 'Royal Scribe';
+  const preview = previewEl.value.trim();
+  if(!url){ hint.textContent = 'file name is required'; return; }
+  if(!preview){ hint.textContent = 'preview text is required'; return; }
+  btn.disabled = true;
+  hint.textContent = 'saving…';
+  try{
+    const { error } = await sb.from('featured_pages').insert({ tag: 'CHRONICLE', author, preview, url });
+    if(error) throw error;
+    urlEl.value = ''; previewEl.value = ''; hint.textContent = '';
+    renderFeaturedList();
+  }catch(e){
+    console.error(e);
+    hint.textContent = "Couldn't save — make sure the featured_pages table exists.";
+  }
+  btn.disabled = false;
 }
 
 function renderPendingFiles(){
