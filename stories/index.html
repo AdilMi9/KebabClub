@@ -83,6 +83,7 @@
   .story-card:hover{transform:translateX(4px);}
   .story-card .thumb{width:64px;height:64px;flex:none;background:var(--paper-shadow);overflow:hidden;}
   .story-card .thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+  .story-card .thumb video{width:100%;height:100%;object-fit:cover;display:block;}
   .story-card .body{min-width:0;}
   .story-meta{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-family:'IBM Plex Mono', monospace;font-size:11px;color:#7A6F62;margin-bottom:6px;}
   .log-num{color:var(--accent-red);}
@@ -95,6 +96,7 @@
   .attachments{display:flex;flex-direction:column;gap:10px;margin-bottom:14px;}
   .attach-item{position:relative;}
   .attach-image img{max-width:100%;max-height:340px;display:block;border:1px solid var(--paper-shadow);}
+  .attach-video video{max-width:100%;max-height:340px;display:block;border:1px solid var(--paper-shadow);}
   .attach-audio audio{width:100%;}
   .attach-file{display:flex;align-items:center;gap:10px;background:#F5EEDD;border:1px solid var(--paper-shadow);padding:9px 12px;font-size:13px;}
   .attach-file a{color:var(--accent-teal);text-decoration:none;}
@@ -110,6 +112,16 @@
   .react-btn.picked{border-color:var(--accent-red);background:#F0DFC8;}
   .react-btn:disabled{opacity:.5;cursor:not-allowed;}
   .danger-zone{margin-top:18px;padding-top:14px;border-top:1px dashed var(--paper-shadow);}
+
+  .comments-title{font-family:'IBM Plex Mono', monospace;font-size:12px;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--muted);margin:32px 0 14px;}
+  .comment{border:1px solid var(--border);padding:12px 14px;margin-bottom:10px;}
+  .comment .meta{font-family:'IBM Plex Mono', monospace;font-size:11px;color:var(--muted);margin-bottom:6px;}
+  .comment p{margin:0;font-size:14px;}
+  .comment-form textarea{
+    width:100%;min-height:70px;background:var(--bg-soft);border:1px solid var(--border);
+    color:var(--text);font-family:'IBM Plex Sans', sans-serif;font-size:14px;padding:10px;margin-bottom:10px;
+  }
 
   .empty, .loading, .error{text-align:center;color:var(--muted);font-family:'IBM Plex Mono', monospace;font-size:13px;padding:50px 20px;border:1px dashed var(--border);}
   .error{color:var(--accent-red);border-color:var(--accent-red);}
@@ -165,7 +177,7 @@ const params = new URLSearchParams(location.search);
 
 function esc(s){ const d=document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
 function formatSize(b){ if(b<1024) return b+' B'; if(b<1024*1024) return (b/1024).toFixed(1)+' KB'; return (b/(1024*1024)).toFixed(1)+' MB'; }
-function kindOf(mime){ if(mime.startsWith('image/')) return 'image'; if(mime.startsWith('audio/')) return 'audio'; return 'file'; }
+function kindOf(mime){ if(mime.startsWith('image/')) return 'image'; if(mime.startsWith('video/')) return 'video'; if(mime.startsWith('audio/')) return 'audio'; return 'file'; }
 
 async function refreshAuth(){
   const { data: { session } } = await sb.auth.getSession();
@@ -233,6 +245,13 @@ async function fetchReactions(storyId){
   if(error) throw error;
   return data;
 }
+async function fetchComments(storyId){
+  const { data, error } = await sb.from('comments').select('*')
+    .eq('target_type','story').eq('target_id', storyId)
+    .order('created_at', {ascending:true});
+  if(error) throw error;
+  return data;
+}
 async function uploadFile(file){
   const path = `${Date.now()}-${Math.random().toString(36).slice(2,8)}-${file.name}`;
   const { error } = await sb.storage.from(BUCKET).upload(path, file);
@@ -244,6 +263,7 @@ async function uploadFile(file){
 function attachmentHtml(a, i, canEdit){
   let inner;
   if(a.kind === 'image') inner = `<div class="attach-image"><img src="${a.url}" alt="${esc(a.name)}" loading="lazy"></div>`;
+  else if(a.kind === 'video') inner = `<div class="attach-video"><video controls src="${a.url}"></video></div>`;
   else if(a.kind === 'audio') inner = `<div class="attach-audio"><audio controls src="${a.url}"></audio></div>`;
   else inner = `<div class="attach-file">📄 <a href="${a.url}" target="_blank" rel="noopener">${esc(a.name)}</a></div>`;
   return `<div class="attach-item" data-i="${i}">${inner}${canEdit ? `<button class="remove-attach" data-i="${i}">✕ Remove attachment</button>` : ''}</div>`;
@@ -286,11 +306,12 @@ async function renderList(){
   feedEl.innerHTML = featuredHtml + stories.map((s,idx)=>{
     const num = total - idx;
     const thumb = (s.attachments||[]).find(a=>a.kind==='image');
+    const videoThumb = !thumb && (s.attachments||[]).find(a=>a.kind==='video');
     const date = new Date(s.created_at);
     const dateStr = date.toLocaleDateString('en-US',{month:'2-digit',day:'2-digit'});
     return `
       <a class="story-card" href="index.html?id=${s.id}">
-        <div class="thumb">${thumb ? `<img src="${thumb.url}">` : ''}</div>
+        <div class="thumb">${thumb ? `<img src="${thumb.url}">` : (videoThumb ? `<video src="${videoThumb.url}" muted preload="metadata"></video>` : '')}</div>
         <div class="body">
           <div class="story-meta">
             <span class="log-num">LOG #${String(num).padStart(3,'0')}</span>
@@ -308,97 +329,7 @@ async function renderList(){
 function renderComposer(){
   const el = document.getElementById('composerArea');
   if(!el) return;
-  if(!currentUser){
-    el.innerHTML = '<div class="login-prompt">Sign in (top right) to add a story.</div>';
-    return;
-  }
-  el.innerHTML = `
-    <div class="panel composer">
-      <h2>Log a story</h2>
-      <div class="tags" id="tagRow">
-        ${TAGS.map(t=>`<button class="tag-btn ${t===selectedTag?'active':''}" data-tag="${t}">${t}</button>`).join('')}
-      </div>
-      <textarea id="storyText" placeholder="What happened?" maxlength="1200"></textarea>
-      <div class="attach-row">
-        <button class="ghost" id="attachBtn">📎 Attach files</button>
-        <button class="ghost" id="recordBtn">🎙️ Record audio</button>
-        <input type="file" id="fileInput" multiple>
-      </div>
-      <div class="pending-files" id="pendingFiles"></div>
-      <button class="submit-btn" id="submitBtn">Log this story →</button>
-      <div class="form-hint" id="formHint"></div>
-    </div>
-  `;
-  document.getElementById('tagRow').querySelectorAll('.tag-btn').forEach(btn=>{
-    btn.addEventListener('click', ()=>{ selectedTag = btn.dataset.tag; renderComposer(); });
-  });
-  const fileInput = document.getElementById('fileInput');
-  document.getElementById('attachBtn').addEventListener('click', ()=> fileInput.click());
-  fileInput.addEventListener('change', ()=>{
-    Array.from(fileInput.files).forEach(f=>pendingFiles.push(f));
-    fileInput.value = '';
-    renderPendingFiles();
-  });
-  const recordBtn = document.getElementById('recordBtn');
-  let recorder=null, chunks=[], stream=null;
-  recordBtn.addEventListener('click', async ()=>{
-    if(recorder && recorder.state === 'recording'){ recorder.stop(); return; }
-    try{ stream = await navigator.mediaDevices.getUserMedia({audio:true}); }
-    catch(e){ document.getElementById('formHint').textContent = "Couldn't access microphone."; return; }
-    chunks=[];
-    recorder = new MediaRecorder(stream);
-    recorder.ondataavailable = e=>chunks.push(e.data);
-    recorder.onstop = ()=>{
-      const blob = new Blob(chunks, {type:'audio/webm'});
-      pendingFiles.push(new File([blob], `voice-${Date.now()}.webm`, {type:'audio/webm'}));
-      renderPendingFiles();
-      stream.getTracks().forEach(t=>t.stop());
-      recordBtn.classList.remove('recording'); recordBtn.textContent = '🎙️ Record audio';
-    };
-    recorder.start();
-    recordBtn.classList.add('recording'); recordBtn.textContent = '⏹ Stop';
-  });
-  renderPendingFiles();
-  document.getElementById('submitBtn').addEventListener('click', handleSubmit);
-}
-
-function renderPendingFiles(){
-  const el = document.getElementById('pendingFiles');
-  if(!el) return;
-  el.innerHTML = pendingFiles.map((f,i)=>`
-    <div class="chip"><span>${esc(f.name)} · ${formatSize(f.size)}</span><button data-i="${i}">✕</button></div>
-  `).join('');
-  el.querySelectorAll('button').forEach(btn=>{
-    btn.addEventListener('click', ()=>{ pendingFiles.splice(Number(btn.dataset.i),1); renderPendingFiles(); });
-  });
-}
-
-async function handleSubmit(){
-  const textEl = document.getElementById('storyText');
-  const submitBtn = document.getElementById('submitBtn');
-  const hint = document.getElementById('formHint');
-  const text = textEl.value.trim();
-  if(!text){ hint.textContent = 'write something first'; return; }
-  submitBtn.disabled = true;
-  hint.textContent = pendingFiles.length ? 'uploading…' : 'saving…';
-  try{
-    const uploaded = [];
-    for(const f of pendingFiles) uploaded.push(await uploadFile(f));
-    const { data, error } = await sb.from('stories').insert({
-      user_id: currentUser.id,
-      author: currentUser.email.split('@')[0],
-      tag: selectedTag,
-      text,
-      attachments: uploaded
-    }).select().single();
-    if(error) throw error;
-    pendingFiles = [];
-    location.href = `index.html?id=${data.id}`;
-  }catch(e){
-    console.error(e);
-    hint.textContent = "Couldn't save — try again.";
-    submitBtn.disabled = false;
-  }
+  el.innerHTML = '';
 }
 
 async function renderDetail(id){
@@ -441,7 +372,52 @@ async function renderDetail(id){
       ${!currentUser ? '<div class="who" style="margin-top:8px;">Sign in to react.</div>' : ''}
       ${canEdit ? `<div class="danger-zone"><button class="btn danger" id="deleteStoryBtn">Delete this story</button></div>` : ''}
     </div>
+
+    <div class="comments-title">Comments</div>
+    <div id="commentsList"><div class="loading">loading…</div></div>
+    <div style="margin-top:14px;">
+      ${currentUser
+        ? `<div class="comment-form">
+             <textarea id="commentText" placeholder="Say something…"></textarea>
+             <button class="btn primary" id="postCommentBtn">Post comment</button>
+             <div class="form-hint" id="commentHint"></div>
+           </div>`
+        : `<div class="login-prompt">Sign in (top right) to leave a comment.</div>`}
+    </div>
   `;
+
+  try{
+    const comments = await fetchComments(id);
+    document.getElementById('commentsList').innerHTML = comments.length
+      ? comments.map(cm => `
+          <div class="comment">
+            <div class="meta">${esc(cm.author_name)} · ${new Date(cm.created_at).toLocaleDateString()}</div>
+            <p>${esc(cm.text)}</p>
+          </div>`).join('')
+      : '<div class="empty">No comments yet.</div>';
+  }catch(e){
+    document.getElementById('commentsList').innerHTML = '<div class="error">Could not load comments.</div>';
+  }
+
+  const postBtn = document.getElementById('postCommentBtn');
+  if(postBtn){
+    postBtn.addEventListener('click', async ()=>{
+      const text = document.getElementById('commentText').value.trim();
+      const hint = document.getElementById('commentHint');
+      if(!text){ hint.textContent = 'write something first'; return; }
+      postBtn.disabled = true;
+      const { error } = await sb.from('comments').insert({
+        user_id: currentUser.id,
+        author_name: currentUser.email.split('@')[0],
+        target_type: 'story',
+        target_id: id,
+        text
+      });
+      postBtn.disabled = false;
+      if(error){ hint.textContent = 'could not post — try again'; return; }
+      renderDetail(id);
+    });
+  }
 
   if(currentUser){
     document.querySelectorAll('.react-btn').forEach(btn=>{
