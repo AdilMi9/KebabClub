@@ -118,6 +118,11 @@
   .comment{border:1px solid var(--border);padding:12px 14px;margin-bottom:10px;}
   .comment .meta{font-family:'IBM Plex Mono', monospace;font-size:11px;color:var(--muted);margin-bottom:6px;}
   .comment p{margin:0;font-size:14px;}
+  .del-comment-btn{
+    font-family:'IBM Plex Mono', monospace;font-size:11px;background:var(--accent-red);color:#fff;
+    border:none;padding:4px 9px;cursor:pointer;margin-top:8px;
+  }
+  .del-comment-btn:hover{filter:brightness(1.1);}
   .comment-form textarea{
     width:100%;min-height:70px;background:var(--bg-soft);border:1px solid var(--border);
     color:var(--text);font-family:'IBM Plex Sans', sans-serif;font-size:14px;padding:10px;margin-bottom:10px;
@@ -161,6 +166,7 @@ const appEl = document.getElementById('app');
 const params = new URLSearchParams(location.search);
 
 function esc(s){ const d=document.createElement('div'); d.textContent = s ?? ''; return d.innerHTML; }
+function displayName(u){ return (u.user_metadata && u.user_metadata.username) ? u.user_metadata.username : u.email.split('@')[0]; }
 function formatSize(b){ if(b<1024) return b+' B'; if(b<1024*1024) return (b/1024).toFixed(1)+' KB'; return (b/(1024*1024)).toFixed(1)+' MB'; }
 function kindOf(mime){ if(mime.startsWith('image/')) return 'image'; if(mime.startsWith('video/')) return 'video'; if(mime.startsWith('audio/')) return 'audio'; return 'file'; }
 
@@ -178,6 +184,7 @@ async function refreshAuth(){
 function renderAuthBox(){
   if(!currentUser){
     authBoxEl.innerHTML = `
+      <input type="text" id="signupUsername" placeholder="username" style="width:110px;">
       <input type="email" id="loginEmail" placeholder="you@email.com">
       <input type="password" id="loginPassword" placeholder="password">
       <button class="btn" id="loginBtn">Log in</button>
@@ -186,6 +193,7 @@ function renderAuthBox(){
     `;
     const emailEl = document.getElementById('loginEmail');
     const passEl = document.getElementById('loginPassword');
+    const usernameEl = document.getElementById('signupUsername');
     const hint = document.getElementById('loginHint');
     document.getElementById('loginBtn').addEventListener('click', async ()=>{
       const email = emailEl.value.trim(), password = passEl.value;
@@ -197,18 +205,28 @@ function renderAuthBox(){
     });
     document.getElementById('signupBtn').addEventListener('click', async ()=>{
       const email = emailEl.value.trim(), password = passEl.value;
+      const username = usernameEl.value.trim();
       if(!email || !password){ hint.textContent = 'enter email and password'; return; }
+      if(!username){ hint.textContent = 'pick a username'; return; }
       if(password.length < 6){ hint.textContent = 'password must be at least 6 characters'; return; }
       hint.textContent = 'creating account…';
-      const { error } = await sb.auth.signUp({ email, password });
+      const { error } = await sb.auth.signUp({ email, password, options: { data: { username } } });
       if(error){ hint.textContent = error.message; return; }
       await refreshAuth(); route();
     });
   } else {
     authBoxEl.innerHTML = `
-      <span class="who">${esc(currentUser.email.split('@')[0])}${isAdmin ? ' · ADMIN' : ''}</span>
+      <span class="who">${esc(displayName(currentUser))}${isAdmin ? ' · ADMIN' : ''}</span>
+      <button class="btn" id="editNameBtn">Edit name</button>
       <button class="btn danger" id="signOutBtn">Sign out</button>
     `;
+    document.getElementById('editNameBtn').addEventListener('click', async ()=>{
+      const next = window.prompt('Choose a username:', displayName(currentUser));
+      if(!next || !next.trim()) return;
+      const { error } = await sb.auth.updateUser({ data: { username: next.trim() } });
+      if(error){ alert('Could not update username.'); return; }
+      await refreshAuth(); route();
+    });
     document.getElementById('signOutBtn').addEventListener('click', async ()=>{
       await sb.auth.signOut(); await refreshAuth(); route();
     });
@@ -380,12 +398,25 @@ async function renderDetail(id){
   try{
     const comments = await fetchComments(id);
     document.getElementById('commentsList').innerHTML = comments.length
-      ? comments.map(cm => `
-          <div class="comment">
+      ? comments.map(cm => {
+          const canDeleteComment = currentUser && (currentUser.id === cm.user_id || isAdmin);
+          return `
+          <div class="comment" data-id="${cm.id}">
             <div class="meta">${esc(cm.author_name)} · ${new Date(cm.created_at).toLocaleDateString()}</div>
             <p>${esc(cm.text)}</p>
-          </div>`).join('')
+            ${canDeleteComment ? `<button class="del-comment-btn" data-id="${cm.id}">✕ Delete</button>` : ''}
+          </div>`;
+        }).join('')
       : '<div class="empty">No comments yet.</div>';
+    document.querySelectorAll('.del-comment-btn').forEach(btn=>{
+      btn.addEventListener('click', async ()=>{
+        if(!confirm('Delete this comment?')) return;
+        btn.disabled = true;
+        const { error } = await sb.from('comments').delete().eq('id', btn.dataset.id);
+        if(error){ alert('Could not delete comment.'); btn.disabled = false; return; }
+        renderDetail(id);
+      });
+    });
   }catch(e){
     document.getElementById('commentsList').innerHTML = '<div class="error">Could not load comments.</div>';
   }
@@ -399,7 +430,7 @@ async function renderDetail(id){
       postBtn.disabled = true;
       const { error } = await sb.from('comments').insert({
         user_id: currentUser.id,
-        author_name: currentUser.email.split('@')[0],
+        author_name: displayName(currentUser),
         target_type: 'story',
         target_id: id,
         text
@@ -459,7 +490,14 @@ function route(){
     return;
   }
   await refreshAuth();
-  sb.auth.onAuthStateChange(async ()=>{ await refreshAuth(); route(); });
+  let lastUserId = currentUser ? currentUser.id : null;
+  sb.auth.onAuthStateChange(async (_event, session)=>{
+    const newId = session && session.user ? session.user.id : null;
+    if(newId === lastUserId) return;
+    lastUserId = newId;
+    await refreshAuth();
+    route();
+  });
   route();
 })();
 </script>
