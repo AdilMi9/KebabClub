@@ -211,6 +211,69 @@ function renderAuthBox(){
     authBoxEl.innerHTML = `
       <input type="email" id="loginEmail" placeholder="you@email.com">
       <input type="password" id="loginPassword" placeholder="password">
+      <input type="password" id="confirmPassword" placeholder="confirm password" style="display:none;">
+      <button class="btn" id="loginBtn">Log in</button>
+      <button class="btn" id="signupBtn">Sign up</button>
+      <span class="who" id="loginHint"></span>
+    `;
+    const emailEl = document.getElementById('loginEmail');
+    const passEl = document.getElementById('loginPassword');
+    const confirmEl = document.getElementById('confirmPassword');
+    const hint = document.getElementById('loginHint');
+
+    document.getElementById('loginBtn').addEventListener('click', async ()=>{
+      confirmEl.style.display = 'none';
+      const email = emailEl.value.trim();
+      const password = passEl.value;
+      if(!email || !password){ hint.textContent = 'enter email and password'; return; }
+      hint.textContent = 'logging in…';
+      const { error } = await sb.auth.signInWithPassword({ email, password });
+      if(error){ hint.textContent = error.message; return; }
+      await refreshAuth();
+      route();
+    });
+
+    document.getElementById('signupBtn').addEventListener('click', async ()=>{
+      const email = emailEl.value.trim();
+      const password = passEl.value;
+
+      // first click: reveal the confirm-password field and stop
+      if(confirmEl.style.display === 'none'){
+        if(!email || !password){ hint.textContent = 'enter email and password'; return; }
+        if(password.length < 6){ hint.textContent = 'password must be at least 6 characters'; return; }
+        confirmEl.style.display = 'inline-block';
+        hint.textContent = 'confirm your password, then click Sign up again';
+        confirmEl.focus();
+        return;
+      }
+
+      // second click: actually check + submit
+      const confirmPassword = confirmEl.value;
+      if(password !== confirmPassword){ hint.textContent = "passwords don't match"; return; }
+
+      hint.textContent = 'creating account…';
+      const { error } = await sb.auth.signUp({ email, password });
+      if(error){ hint.textContent = error.message; return; }
+      await refreshAuth();
+      route();
+    });
+  } else {
+    authBoxEl.innerHTML = `
+      <span class="who">${esc(currentUser.email)}${isAdmin ? ' · ADMIN' : ''}</span>
+      ${isAdmin ? '<a class="btn" href="index.html?new=1">+ New character</a>' : ''}
+      <button class="btn danger" id="signOutBtn">Sign out</button>
+    `;
+    document.getElementById('signOutBtn').addEventListener('click', async ()=>{
+      await sb.auth.signOut();
+      await refreshAuth();
+      route();
+    });
+  }
+}
+  if(!currentUser){
+    authBoxEl.innerHTML = `
+      <input type="email" id="loginEmail" placeholder="you@email.com">
+      <input type="password" id="loginPassword" placeholder="password">
       <button class="btn" id="loginBtn">Log in</button>
       <button class="btn" id="signupBtn">Sign up</button>
       <span class="who" id="loginHint"></span>
