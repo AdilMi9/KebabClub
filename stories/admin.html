@@ -220,6 +220,12 @@ function renderApp(){
       <input type="text" id="fAuthor" value="Royal Scribe">
       <label class="field-label">Preview text</label>
       <textarea id="fPreview" placeholder="Short description shown on the card…"></textarea>
+      <label class="field-label">Thumbnail image (optional)</label>
+      <div class="attach-row">
+        <button class="ghost" id="fThumbBtn">🖼️ Choose image</button>
+        <input type="file" id="fThumbInput" accept="image/*">
+        <span class="who" id="fThumbStatus">no image</span>
+      </div>
       <button class="submit-btn" id="addFeaturedBtn">Add page →</button>
       <div class="form-hint" id="featuredHint"></div>
     </div>
@@ -261,7 +267,15 @@ function renderApp(){
   renderPendingFiles();
   document.getElementById('submitBtn').addEventListener('click', handleSubmit);
 
-  document.getElementById('addFeaturedBtn').addEventListener('click', handleAddFeatured);
+  let thumbFile = null;
+  const thumbInput = document.getElementById('fThumbInput');
+  document.getElementById('fThumbBtn').addEventListener('click', ()=> thumbInput.click());
+  thumbInput.addEventListener('change', ()=>{
+    thumbFile = thumbInput.files[0] || null;
+    document.getElementById('fThumbStatus').textContent = thumbFile ? thumbFile.name : 'no image';
+  });
+
+  document.getElementById('addFeaturedBtn').addEventListener('click', ()=> handleAddFeatured(thumbFile, ()=>{ thumbFile = null; }));
   renderFeaturedList();
 }
 
@@ -274,7 +288,8 @@ async function renderFeaturedList(){
     if(error) throw error;
     el.innerHTML = data.length ? data.map(f => `
       <div class="featured-row" data-id="${f.id}">
-        <div>
+        ${f.thumbnail_url ? `<img src="${f.thumbnail_url}" style="width:44px;height:44px;object-fit:cover;flex:none;">` : ''}
+        <div style="flex:1;">
           <div class="meta">${esc(f.tag)} · ${esc(f.author)} · ${esc(f.url)}</div>
           <p>${esc(f.preview)}</p>
         </div>
@@ -294,7 +309,7 @@ async function renderFeaturedList(){
   }
 }
 
-async function handleAddFeatured(){
+async function handleAddFeatured(thumbFile, onDone){
   const urlEl = document.getElementById('fUrl');
   const authorEl = document.getElementById('fAuthor');
   const previewEl = document.getElementById('fPreview');
@@ -306,15 +321,23 @@ async function handleAddFeatured(){
   if(!url){ hint.textContent = 'file name is required'; return; }
   if(!preview){ hint.textContent = 'preview text is required'; return; }
   btn.disabled = true;
-  hint.textContent = 'saving…';
+  hint.textContent = thumbFile ? 'uploading image…' : 'saving…';
   try{
-    const { error } = await sb.from('featured_pages').insert({ tag: 'CHRONICLE', author, preview, url });
+    let thumbnail_url = null;
+    if(thumbFile){
+      const uploaded = await uploadFile(thumbFile);
+      thumbnail_url = uploaded.url;
+    }
+    const { error } = await sb.from('featured_pages').insert({ tag: 'CHRONICLE', author, preview, url, thumbnail_url });
     if(error) throw error;
     urlEl.value = ''; previewEl.value = ''; hint.textContent = '';
+    document.getElementById('fThumbStatus').textContent = 'no image';
+    document.getElementById('fThumbInput').value = '';
+    if(onDone) onDone();
     renderFeaturedList();
   }catch(e){
     console.error(e);
-    hint.textContent = "Couldn't save — make sure the featured_pages table exists.";
+    hint.textContent = "Couldn't save — make sure the featured_pages table has a thumbnail_url column.";
   }
   btn.disabled = false;
 }

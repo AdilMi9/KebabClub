@@ -279,7 +279,7 @@ async function renderList(){
   const featured = await fetchFeatured().catch(()=>[]);
   const featuredHtml = featured.map(f => `
     <a class="story-card" href="${f.url}" target="_blank" rel="noopener">
-      <div class="thumb"></div>
+      <div class="thumb">${f.thumbnail_url ? `<img src="${f.thumbnail_url}">` : ''}</div>
       <div class="body">
         <div class="story-meta">
           <span class="pill">${esc(f.tag)}</span>
