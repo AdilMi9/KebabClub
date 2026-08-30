@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- ============================================================
+     ЗАГОЛОВОК ДЛЯ ПРЕДПРОСМОТРА — редактируй только здесь.
+     PAGE_TITLE  — вкладка браузера + заголовок в превью ссылки
+     PAGE_DESC   — подпись под заголовком в превью (WhatsApp/Telegram/iMessage и т.д.)
+     ============================================================ -->
+<title>The Chronicle of Mustachestan</title>
+<meta name="description" content="A royal chronicle of Mustachestan — pigeons, kebab, and one truly magnificent mustache.">
+<meta property="og:title" content="The Chronicle of Mustachestan">
+<meta property="og:description" content="A royal chronicle of Mustachestan — pigeons, kebab, and one truly magnificent mustache.">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="The Chronicle of Mustachestan">
+<meta name="twitter:description" content="A royal chronicle of Mustachestan — pigeons, kebab, and one truly magnificent mustache.">
+<!-- ============================================================ -->
+
+<link href="https://fonts.googleapis.com/css2?family=Uncial+Antiqua&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,400;1,600&family=IM+Fell+English:ital@0;1&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --vellum:    #f0e4c0;
+  --vellum2:   #e8d8ac;
+  --ink:       #1a0e06;
+  --gold:      #c8902a;
+  --gold-l:    #e8b840;
+  --vermilion: #8a1a20;
+  --lapis:     #1a3a6a;
+  --viridian:  #1a4a1a;
+  --dim:       #6a5a3a;
+  --border:    rgba(200,144,42,.35);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: #c8b890;
+  font-family: 'IM Fell English', serif;
+  color: var(--ink);
+  overflow-x: hidden;
+}
+
+/* ══════════════════════════════
+   PARCHMENT TEXTURE
+══════════════════════════════ */
+body::before {
+  content:'';
+  position: fixed; inset:0; pointer-events:none; z-index:9000;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23p)' opacity='0.045'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+/* ══════════════════════════════
+   COVER — ROYAL PROCLAMATION
+══════════════════════════════ */
+.cover {
+  min-height: 100vh;
+  background: var(--vellum);
+  display: flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding: 3rem 2rem;
+  position:relative; overflow:hidden;
+}
+
+/* aged edge shadow */
+.cover::after {
+  content:'';
+  position:absolute; inset:0; pointer-events:none;
+  background: radial-gradient(ellipse at 50% 50%, transparent 60%, rgba(100,70,20,.35) 100%);
+}
+
+/* decorative ruled lines on cover */
+.cover-rule { width:100%; max-width:640px; height:1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); margin:.6rem 0; }
+.cover-rule.thick { height:3px; }
+
+.cover-eyebrow {
+  font-family:'Cinzel', serif; font-size:.65rem;
+  letter-spacing:4px; color:var(--dim);
+  text-transform:uppercase; margin-bottom:.4rem;
+}
+.cover-title {
+  font-family:'Uncial Antiqua', serif;
+  font-size: clamp(2rem, 8vw, 4.8rem);
+  color: var(--ink);
+  text-align:center; line-height:1.05;
+  text-shadow: 2px 2px 0 rgba(200,144,42,.2);
+}
+.cover-title .gold { color: var(--gold); }
+.cover-subtitle {
+  font-family:'Cormorant Garamond', serif;
+  font-style:italic; font-size: clamp(1rem, 2.5vw, 1.3rem);
+  color: var(--dim); text-align:center; margin:.4rem 0;
+}
+.cover-volume {
+  font-family:'Cinzel',serif; font-size:.7rem;
+  letter-spacing:3px; color:var(--vermilion);
+  margin-top:.3rem;
+}
+
+.scroll-cue {
+  margin-top:2.5rem;
+  font-family:'Cinzel',serif; font-size:.6rem;
+  letter-spacing:3px; color:var(--dim);
+  animation: breathe 3s ease-in-out infinite;
+}
+@keyframes breathe { 0%,100%{opacity:.3} 50%{opacity:.8} }
+
+/* ══════════════════════════════
+   CHAPTER STRUCTURE
+══════════════════════════════ */
+.chronicle { max-width:900px; margin:0 auto; padding:0 1rem 6rem; }
+
+/* COAT OF ARMS divider — grows more complex */
+.coa-divider {
+  text-align:center; margin:3.5rem 0 2rem;
+  opacity:0; transform:translateY(20px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.coa-divider.vis { opacity:1; transform:translateY(0); }
+
+/* Chapter blocks */
+.chapter {
+  margin: 0 0 3rem;
+  opacity:0; transform:translateY(24px);
+  transition: opacity .65s ease, transform .65s ease;
+}
+.chapter.vis { opacity:1; transform:translateY(0); }
+
+/* Illuminated page spread */
+.page-spread {
+  background: var(--vellum);
+  border: 1px solid var(--border);
+  box-shadow: 3px 3px 20px rgba(100,70,20,.25), -1px -1px 8px rgba(200,144,42,.1);
+  position: relative; overflow:hidden;
+}
+
+/* decorative border inside */
+.page-spread::before {
+  content:'';
+  position:absolute; inset:6px;
+  border: 1px solid rgba(200,144,42,.25);
+  pointer-events:none;
+}
+
+.spread-inner {
+  display:grid; grid-template-columns:1fr 1fr;
+}
+.spread-inner.single { grid-template-columns:1fr; }
+
+.spread-art {
+  background: var(--vellum2);
+  border-right: 1px solid var(--border);
+  min-height:280px;
+  display:flex; align-items:center; justify-content:center;
+  padding:2rem; position:relative; overflow:hidden;
+}
+.spread-inner.flip { direction:rtl; }
+.spread-inner.flip > * { direction:ltr; }
+.spread-inner.flip .spread-art { border-right:none; border-left:1px solid var(--border); }
+
+.spread-text {
+  padding:2.5rem 2.2rem;
+  display:flex; flex-direction:column; justify-content:center; gap:.8rem;
+}
+
+/* Drop cap */
+.dropcap {
+  font-family:'Uncial Antiqua',serif;
+  font-size:3.6rem; float:left;
+  line-height:.75; margin-right:.12em; margin-top:.05em;
+  color:var(--vermilion);
+}
+.dropcap.gold { color:var(--gold); }
+.dropcap.lapis { color:var(--lapis); }
+
+.spread-text p {
+  font-size:1.02rem; line-height:1.95;
+  color:#2a1a0a; text-align:justify;
+}
+.spread-text p em { color:var(--lapis); font-style:italic; }
+.spread-text p strong { color:var(--ink); font-style:normal; }
+
+/* Chapter header inside spread */
+.ch-inhead {
+  font-family:'Cormorant Garamond',serif; font-weight:700;
+  font-size:clamp(1rem,3vw,1.5rem); color:var(--ink);
+  text-align:center; line-height:1.2;
+  border-bottom:1px solid var(--border);
+  padding-bottom:.6rem; margin-bottom:.8rem;
+}
+.ch-inhead .roman {
+  font-family:'Cinzel',serif; font-size:.65rem;
+  letter-spacing:3px; color:var(--dim); display:block;
+  margin-bottom:.2rem;
+}
+
+/* Marginal note */
+.marginal {
+  position:absolute; right:-120px; top:40px;
+  width:110px;
+  font-family:'IM Fell English',serif; font-style:italic;
+  font-size:.68rem; color:var(--dim); line-height:1.6;
+  text-align:right; transform:rotate(-1deg);
+}
+
+/* Dialogue — scroll style */
+.scroll-say {
+  background: rgba(200,144,42,.06);
+  border-left:3px solid var(--gold);
+  border-right:1px solid rgba(200,144,42,.2);
+  padding:.5rem 1rem;
+  font-style:italic; font-size:.95rem;
+  color:#3a2010; margin:.2rem 0;
+}
+.scroll-say .speaker {
+  font-family:'Cinzel',serif; font-style:normal;
+  font-size:.58rem; letter-spacing:2px;
+  color:var(--vermilion); display:block; margin-bottom:.15rem;
+}
+.scroll-say.lapis { border-left-color:var(--lapis); }
+.scroll-say.lapis .speaker { color:var(--lapis); }
+.scroll-say.vermilion { border-left-color:var(--vermilion); }
+.scroll-say.vermilion .speaker { color:var(--vermilion); }
+.scroll-say.viridian { border-left-color:var(--viridian); }
+.scroll-say.viridian .speaker { color:var(--viridian); }
+
+/* Wide spread: art on top, two-col prose below */
+.wide-spread {
+  background: var(--vellum);
+  border:1px solid var(--border);
+  box-shadow: 3px 3px 20px rgba(100,70,20,.25);
+  position:relative; overflow:hidden;
+}
+.wide-spread::before {
+  content:''; position:absolute; inset:6px;
+  border:1px solid rgba(200,144,42,.25);
+  pointer-events:none;
+}
+.wide-art {
+  background:var(--vellum2);
+  border-bottom:1px solid var(--border);
+  min-height:230px;
+  display:flex; align-items:center; justify-content:center;
+  padding:1.5rem; overflow:hidden;
+}
+.wide-prose {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:2.5rem; padding:2.5rem 2.2rem;
+}
+.wide-prose p { font-size:1.02rem; line-height:1.95; color:#2a1a0a; text-align:justify; }
+.wide-prose p em { color:var(--lapis); font-style:italic; }
+.wide-prose p strong { color:var(--ink); }
+
+/* ══════════════════════════════
+   SVG ANIMATION KEYFRAMES
+══════════════════════════════ */
+@keyframes floatY   { 0%,100%{transform:translateY(0)}   50%{transform:translateY(-9px)} }
+@keyframes glowG    { 0%,100%{filter:drop-shadow(0 0 5px rgba(200,144,42,.6))} 50%{filter:drop-shadow(0 0 18px rgba(232,184,64,.9))} }
+@keyframes shimmer  { from{transform:translateX(-100%)} to{transform:translateX(400%)} }
+@keyframes pigBob   { 0%,100%{transform:translateY(0) rotate(-3deg)} 50%{transform:translateY(-5px) rotate(3deg)} }
+@keyframes cape     { 0%,100%{transform:rotate(-2deg)} 50%{transform:rotate(2deg)} }
+@keyframes twinkle  { 0%,100%{opacity:.3} 50%{opacity:1} }
+@keyframes faint    { 0%{transform:translateY(0) rotate(0)} 100%{transform:translateY(40px) rotate(-20deg)} }
+@keyframes crumble  { 0%{transform:translateY(0) rotate(0deg);opacity:1} 60%{transform:translateY(20px) rotate(45deg);opacity:.5} 100%{transform:translateY(60px) rotate(90deg);opacity:0} }
+@keyframes heartGlow{ 0%,100%{filter:drop-shadow(0 0 4px rgba(200,144,42,.4))} 50%{filter:drop-shadow(0 0 16px rgba(200,144,42,.9))} }
+
+.stache-glow { animation: glowG 2s ease-in-out infinite; }
+
+/* ══════════════════════════════
+   EPILOGUE
+══════════════════════════════ */
+.epilogue {
+  max-width:900px; margin:0 auto;
+  padding:3rem 1rem 7rem; text-align:center;
+  opacity:0; transform:translateY(24px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.epilogue.vis { opacity:1; transform:translateY(0); }
+
+.epi-card {
+  background:var(--vellum);
+  border:1px solid var(--border);
+  box-shadow: 3px 3px 20px rgba(100,70,20,.25);
+  padding:3.5rem 3rem;
+  position:relative;
+}
+.epi-card::before {
+  content:''; position:absolute; inset:8px;
+  border:1px solid rgba(200,144,42,.25);
+  pointer-events:none;
+}
+.epi-title {
+  font-family:'Uncial Antiqua',serif;
+  font-size:clamp(1.5rem,5vw,2.8rem);
+  color:var(--gold); margin-bottom:1.2rem;
+  text-shadow:1px 2px 0 rgba(100,60,0,.2);
+}
+.epi-body {
+  font-family:'IM Fell English',serif;
+  font-style:italic; font-size:1.05rem;
+  line-height:2; color:#3a2010; max-width:580px;
+  margin:0 auto;
+}
+.epi-body em { color:var(--vermilion); font-style:normal; }
+.epi-body strong { color:var(--ink); }
+.epi-motto {
+  margin-top:2rem;
+  font-family:'Cinzel',serif; font-size:.7rem;
+  letter-spacing:4px; color:var(--dim);
+}
+
+/* RESPONSIVE */
+@media(max-width:640px){
+  .spread-inner, .spread-inner.flip { grid-template-columns:1fr; direction:ltr; }
+  .spread-art { border-right:none!important; border-left:none!important; border-bottom:1px solid var(--border); min-height:200px; }
+  .wide-prose { grid-template-columns:1fr; }
+  .marginal { display:none; }
+  .epi-card { padding:2rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ COVER ══════════════════ -->
+<div class="cover">
+  <!-- decorative corner flourishes -->
+  <svg style="position:absolute;top:0;left:0;width:120px;height:120px;opacity:.35" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 5 Q5 40 20 40 Q40 40 40 20 Q40 5 5 5 Z" fill="none" stroke="#c8902a" stroke-width="1.2"/>
+    <path d="M5 5 L5 60 M5 5 L60 5" stroke="#c8902a" stroke-width="1.5" fill="none"/>
+    <path d="M15 5 L15 25 Q15 35 25 35 L45 35" stroke="#c8902a" stroke-width=".8" fill="none"/>
+    <circle cx="5" cy="5" r="3" fill="#c8902a"/>
+  </svg>
+  <svg style="position:absolute;top:0;right:0;width:120px;height:120px;opacity:.35;transform:scaleX(-1)" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 5 Q5 40 20 40 Q40 40 40 20 Q40 5 5 5 Z" fill="none" stroke="#c8902a" stroke-width="1.2"/>
+    <path d="M5 5 L5 60 M5 5 L60 5" stroke="#c8902a" stroke-width="1.5" fill="none"/>
+    <path d="M15 5 L15 25 Q15 35 25 35 L45 35" stroke="#c8902a" stroke-width=".8" fill="none"/>
+    <circle cx="5" cy="5" r="3" fill="#c8902a"/>
+  </svg>
+  <svg style="position:absolute;bottom:0;left:0;width:120px;height:120px;opacity:.35;transform:scaleY(-1)" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 5 Q5 40 20 40 Q40 40 40 20 Q40 5 5 5 Z" fill="none" stroke="#c8902a" stroke-width="1.2"/>
+    <path d="M5 5 L5 60 M5 5 L60 5" stroke="#c8902a" stroke-width="1.5" fill="none"/>
+    <path d="M15 5 L15 25 Q15 35 25 35 L45 35" stroke="#c8902a" stroke-width=".8" fill="none"/>
+    <circle cx="5" cy="5" r="3" fill="#c8902a"/>
+  </svg>
+  <svg style="position:absolute;bottom:0;right:0;width:120px;height:120px;opacity:.35;transform:scale(-1,-1)" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+    <path d="M5 5 Q5 40 20 40 Q40 40 40 20 Q40 5 5 5 Z" fill="none" stroke="#c8902a" stroke-width="1.2"/>
+    <path d="M5 5 L5 60 M5 5 L60 5" stroke="#c8902a" stroke-width="1.5" fill="none"/>
+    <path d="M15 5 L15 25 Q15 35 25 35 L45 35" stroke="#c8902a" stroke-width=".8" fill="none"/>
+    <circle cx="5" cy="5" r="3" fill="#c8902a"/>
+  </svg>
+
+  <!-- mustache ornament -->
+  <svg width="120" height="35" viewBox="0 0 120 35" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:.8rem;animation:glowG 3s ease-in-out infinite">
+    <path d="M5 18 Q12 8 22 12 Q30 15 35 12 Q42 9 50 10 Q57 11 60 8 Q63 11 70 10 Q78 9 85 12 Q90 15 98 12 Q108 8 115 18 Q108 26 98 22 Q90 19 85 22 Q78 25 70 22 Q63 20 60 23 Q57 20 50 22 Q42 25 35 22 Q30 19 22 22 Q12 26 5 18Z" fill="#c8902a" class="stache-glow"/>
+    <path d="M5 18 Q12 10 22 13 Q30 16 35 13 Q42 10 50 11 Q57 12 60 9" stroke="#e8b840" stroke-width="1.5" fill="none"/>
+    <path d="M60 9 Q63 12 70 11 Q78 10 85 13 Q90 16 98 13 Q108 10 115 18" stroke="#e8b840" stroke-width="1.5" fill="none"/>
+  </svg>
+
+  <div class="cover-eyebrow">The Royal Chronicles of the Kingdom of</div>
+
+  <div class="cover-rule thick"></div>
+  <div class="cover-title"><span class="gold">Mustachestan</span></div>
+  <div class="cover-rule thick"></div>
+
+  <div class="cover-subtitle">Being the True and Complete Account of How</div>
+  <div class="cover-title" style="font-size:clamp(1.5rem,5vw,3rem)">SuperWyndfal the Magnificent</div>
+  <div class="cover-subtitle">Did Find His Cousin, Travel to a Kingdom, Defeat a Villain,<br>and Wed the Lady Maria of the Equal Mustache</div>
+  <div class="cover-rule"></div>
+  <div class="cover-volume">Volume II · The Mustache Saga · Illuminated Edition</div>
+
+  <div class="scroll-cue">— turn the page —</div>
+</div>
+
+<!-- ══════════════════ THE CHRONICLE ══════════════════ -->
+<div class="chronicle">
+
+  <!-- ═══ COA DIVIDER 1 — plain ═══ -->
+  <div class="coa-divider" data-r>
+    <svg viewBox="0 0 320 130" width="320" xmlns="http://www.w3.org/2000/svg">
+      <!-- flanking lines -->
+      <line x1="0" y1="65" x2="95" y2="65" stroke="#c8902a" stroke-width="1" opacity=".4"/>
+      <line x1="225" y1="65" x2="320" y2="65" stroke="#c8902a" stroke-width="1" opacity=".4"/>
+      <!-- shield basic -->
+      <path d="M130 10 L190 10 L190 70 Q190 100 160 115 Q130 100 130 70 Z" fill="#7a1a20" stroke="#c8902a" stroke-width="2"/>
+      <!-- crossed mustaches on shield -->
+      <g transform="translate(160,60)">
+        <path d="M-22 0 Q-15 -8 -8 -5 Q-3 -3 0 -5 Q3 -3 8 -5 Q15 -8 22 0 Q15 6 8 3 Q3 5 0 3 Q-3 5 -8 3 Q-15 6 -22 0Z" fill="#e8b840" transform="rotate(-20)"/>
+        <path d="M-22 0 Q-15 -8 -8 -5 Q-3 -3 0 -5 Q3 -3 8 -5 Q15 -8 22 0 Q15 6 8 3 Q3 5 0 3 Q-3 5 -8 3 Q-15 6 -22 0Z" fill="#e8b840" transform="rotate(20)"/>
+      </g>
+      <!-- motto scroll -->
+      <path d="M115 118 Q160 128 205 118" fill="#e8d090" stroke="#c8902a" stroke-width="1"/>
+      <text x="160" y="126" text-anchor="middle" font-family="Cinzel,serif" font-size="7" fill="#7a1a20" letter-spacing="1">PER MUSTACHIO AD ASTRA</text>
+      <!-- chapter label -->
+      <text x="160" y="22" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#c8902a" letter-spacing="2">CHAPTER THE FIRST</text>
+    </svg>
+  </div>
+
+  <!-- ═══ CHAPTER I — THE CHANCE MEETING ═══ -->
+  <div class="chapter" data-r>
+    <div class="page-spread">
+      <div class="spread-inner">
+        <div class="spread-art">
+          <svg viewBox="0 0 260 280" width="260" xmlns="http://www.w3.org/2000/svg">
+            <!-- cobblestone street -->
+            <rect width="260" height="280" fill="#d8c89a"/>
+            <ellipse cx="50"  cy="270" rx="28" ry="10" fill="#c8b888" opacity=".5"/>
+            <ellipse cx="130" cy="270" rx="32" ry="10" fill="#c8b888" opacity=".4"/>
+            <ellipse cx="210" cy="270" rx="28" ry="10" fill="#c8b888" opacity=".5"/>
+            <!-- cobbles -->
+            <ellipse cx="30"  cy="255" rx="18" ry="8"  fill="#b8a878" opacity=".4"/>
+            <ellipse cx="80"  cy="260" rx="20" ry="8"  fill="#b8a878" opacity=".3"/>
+            <ellipse cx="140" cy="258" rx="22" ry="8"  fill="#b8a878" opacity=".35"/>
+            <ellipse cx="195" cy="256" rx="18" ry="8"  fill="#b8a878" opacity=".4"/>
+            <!-- building facade behind -->
+            <rect x="0" y="0" width="260" height="200" fill="#c8b080"/>
+            <rect x="10" y="20" width="60" height="80" rx="2" fill="#b8a070" stroke="#a89060" stroke-width="1"/>
+            <rect x="190" y="30" width="60" height="70" rx="2" fill="#b8a070" stroke="#a89060" stroke-width="1"/>
+            <!-- windows -->
+            <rect x="25"  y="35" width="20" height="25" rx="2" fill="#8090a0" opacity=".5"/>
+            <rect x="55"  y="35" width="20" height="25" rx="2" fill="#8090a0" opacity=".4"/>
+            <rect x="200" y="45" width="20" height="25" rx="2" fill="#8090a0" opacity=".5"/>
+            <rect x="225" y="45" width="20" height="25" rx="2" fill="#8090a0" opacity=".4"/>
+            <!-- warm sun glow from above -->
+            <ellipse cx="130" cy="0" rx="100" ry="60" fill="#e8c860" opacity=".12"/>
+
+            <!-- SUPERWYNDFAL — left side, cape billowing gently -->
+            <path d="M60 200 Q45 230 30 255 Q75 240 95 255 Q92 225 95 200" fill="#1a3a6a" style="animation:cape 3s ease-in-out infinite;transform-origin:78px 228px"/>
+            <rect x="58" y="170" width="52" height="60" rx="8" fill="#2563a8"/>
+            <!-- S emblem -->
+            <circle cx="84" cy="197" r="14" fill="#c8902a"/>
+            <text x="84" y="203" text-anchor="middle" font-family="serif" font-weight="900" font-size="16" fill="#1a0e06">S</text>
+            <ellipse cx="84" cy="148" rx="28" ry="30" fill="#e0c090"/>
+            <path d="M59 136 Q64 112 84 108 Q104 112 109 136" fill="#3a2010"/>
+            <ellipse cx="76" cy="146" rx="4.5" ry="5" fill="#2b1d0e"/>
+            <ellipse cx="92" cy="146" rx="4.5" ry="5" fill="#2b1d0e"/>
+            <circle cx="77.5" cy="144" r="1.8" fill="white"/>
+            <circle cx="93.5" cy="144" r="1.8" fill="white"/>
+            <!-- MAGNIFICENT MUSTACHE glowing -->
+            <g class="stache-glow">
+              <path d="M58 164 Q65 156 75 159 Q81 161 84 159 Q87 157 93 156 Q103 155 110 164 Q103 170 93 167 Q87 169 84 167 Q81 165 75 168 Q65 171 58 164Z" fill="#c8902a"/>
+              <path d="M58 164 Q65 158 75 161 Q81 163 84 160" stroke="#e8b840" stroke-width="1.5" fill="none"/>
+              <path d="M84 160 Q87 158 93 157 Q103 156 110 164" stroke="#e8b840" stroke-width="1.5" fill="none"/>
+            </g>
+            <!-- smile of recognition -->
+            <path d="M74 176 Q84 181 94 176" stroke="#2b1d0e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- boots -->
+            <rect x="62" y="224" width="18" height="14" rx="4" fill="#1a0e06"/>
+            <rect x="84" y="224" width="18" height="14" rx="4" fill="#1a0e06"/>
+
+            <!-- REGINALD — right side, decent but lesser mustache -->
+            <ellipse cx="178" cy="150" rx="25" ry="27" fill="#d8b880"/>
+            <path d="M156 137 Q160 115 178 111 Q196 115 200 137" fill="#2a1808"/>
+            <ellipse cx="170" cy="148" rx="4" ry="4.5" fill="#2b1d0e"/>
+            <ellipse cx="186" cy="148" rx="4" ry="4.5" fill="#2b1d0e"/>
+            <!-- DECENT MUSTACHE — good, not great -->
+            <path d="M158 166 Q164 160 172 162 Q176 164 178 162 Q180 160 186 160 Q194 159 200 166 Q194 171 186 168 Q180 170 178 168 Q176 166 172 169 Q164 172 158 166Z" fill="#8a5020"/>
+            <!-- slight rueful expression — knows it's lesser -->
+            <path d="M168 176 Q178 179 188 176" stroke="#2b1d0e" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <!-- clothes — respectable but not super -->
+            <rect x="155" y="175" width="46" height="55" rx="7" fill="#2a4a2a"/>
+            <rect x="157" y="222" width="16" height="16" rx="4" fill="#1a0e06"/>
+            <rect x="177" y="222" width="16" height="16" rx="4" fill="#1a0e06"/>
+            <!-- hat — that's a hat -->
+            <ellipse cx="178" cy="125" rx="30" ry="7" fill="#2a1808"/>
+            <rect x="160" y="100" width="36" height="28" rx="4" fill="#3a2010"/>
+            <ellipse cx="178" cy="100" rx="18" ry="5" fill="#2a1808"/>
+            <!-- mustache comparison arrows -->
+            <text x="130" y="165" text-anchor="middle" font-family="serif" font-size="9" fill="#c8902a" opacity=".7">≪</text>
+          </svg>
+        </div>
+        <div class="spread-text">
+          <div class="ch-inhead"><span class="roman">Chapter I</span>The Chance Encounter of Two Mustaches</div>
+          <p><span class="dropcap">I</span>t was a Tuesday of no particular significance when SuperWyndfal, returning from a morning of modest heroics, noticed something on the corner of Merchant's Square.</p>
+          <p>A man was standing outside a haberdashery. He had a <em>mustache</em>. Not merely a mustache — a good one. Dark, curved, with evident intention. SuperWyndfal slowed his flight and alighted on the pavement for a closer look.</p>
+          <p>The man had noticed SuperWyndfal's mustache at the same moment. They stood for a long moment in mutual assessment.</p>
+          <div class="scroll-say viridian"><span class="speaker">THE STRANGER</span>"That is an extraordinary mustache."</div>
+          <div class="scroll-say"><span class="speaker">SUPERWYNDFAL</span>"And yours is... very respectable."</div>
+          <p>The stranger understood the hierarchy instantly and completely. He was at peace with it — for he had lived his whole life knowing that his mustache was good, and that being the bearer of a good mustache was itself a gift.</p>
+          <div class="scroll-say viridian"><span class="speaker">THE STRANGER</span>"My name is Reginald von Wyndfal."</div>
+          <p>SuperWyndfal blinked. <em>"Wyndfal."</em></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ COA DIVIDER 2 ═══ -->
+  <div class="coa-divider" data-r>
+    <svg viewBox="0 0 320 135" width="320" xmlns="http://www.w3.org/2000/svg">
+      <line x1="0" y1="65" x2="90" y2="65" stroke="#c8902a" stroke-width="1" opacity=".4"/>
+      <line x1="230" y1="65" x2="320" y2="65" stroke="#c8902a" stroke-width="1" opacity=".4"/>
+      <path d="M130 10 L190 10 L190 70 Q190 100 160 115 Q130 100 130 70 Z" fill="#7a1a20" stroke="#c8902a" stroke-width="2"/>
+      <g transform="translate(160,60)">
+        <path d="M-22 0 Q-15 -8 -8 -5 Q-3 -3 0 -5 Q3 -3 8 -5 Q15 -8 22 0 Q15 6 8 3 Q3 5 0 3 Q-3 5 -8 3 Q-15 6 -22 0Z" fill="#e8b840" transform="rotate(-20)"/>
+        <path d="M-22 0 Q-15 -8 -8 -5 Q-3 -3 0 -5 Q3 -3 8 -5 Q15 -8 22 0 Q15 6 8 3 Q3 5 0 3 Q-3 5 -8 3 Q-15 6 -22 0Z" fill="#e8b840" transform="rotate(20)"/>
+      </g>
+      <!-- pigeon supporter added -->
+      <text x="118" y="78" font-size="18" style="animation:pigBob 2s ease-in-out infinite">🐦</text>
+      <path d="M115 118 Q160 128 205 118" fill="#e8d090" stroke="#c8902a" stroke-width="1"/>
+      <text x="160" y="126" text-anchor="middle" font-family="Cinzel,serif" font-size="7" fill="#7a1a20" letter-spacing="1">PER MUSTACHIO AD ASTRA</text>
+      <text x="160" y="22" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#c8902a" letter-spacing="2">CHAPTER THE SECOND</text>
+    </svg>
+  </div>
+
+  <!-- ═══ CHAPTER II — THE COUSIN + EVRAN ═══ -->
+  <div class="chapter" data-r>
+    <div class="page-spread">
+      <div class="spread-inner flip">
+        <div class="spread-art">
+          <svg viewBox="0 0 260 280" width="260" xmlns="http://www.w3.org/2000/svg">
+            <!-- tavern interior -->
+            <rect width="260" height="280" fill="#c8a870"/>
+            <!-- table and warm lamp light -->
+            <ellipse cx="130" cy="230" rx="95" ry="30" fill="#a07040"/>
+            <rect x="40" y="195" width="180" height="12" rx="3" fill="#8a5820"/>
+            <!-- warm glow from above -->
+            <ellipse cx="130" cy="100" rx="70" ry="50" fill="#e8c050" opacity=".15"/>
+            <!-- lantern -->
+            <rect x="120" y="30" width="20" height="30" rx="4" fill="#e8b040" opacity=".6"/>
+            <line x1="130" y1="10" x2="130" y2="30" stroke="#8a5820" stroke-width="2"/>
+
+            <!-- EVRAN at the table with scroll and kebab and pigeon -->
+            <ellipse cx="55" cy="185" rx="18" ry="19" fill="#c8a060"/>
+            <path d="M40 172 Q44 152 55 148 Q66 152 70 172" fill="#4a2a10"/>
+            <!-- knowing expression -->
+            <path d="M47 183 Q51 180 55 183" stroke="#2b1d0e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M55 183 Q59 180 63 183" stroke="#2b1d0e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <path d="M47 192 Q55 196 63 192" stroke="#2b1d0e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- scroll on table -->
+            <rect x="30" y="205" width="45" height="28" rx="3" fill="#f0e4c0" stroke="#c8902a" stroke-width="1"/>
+            <line x1="34" y1="212" x2="71" y2="212" stroke="#8a6040" stroke-width=".8"/>
+            <line x1="34" y1="217" x2="71" y2="217" stroke="#8a6040" stroke-width=".8"/>
+            <line x1="34" y1="222" x2="65" y2="222" stroke="#8a6040" stroke-width=".8"/>
+            <text x="52" y="210" text-anchor="middle" font-family="Cinzel,serif" font-size="5" fill="#7a1a20">MUSTACHESTAN</text>
+            <!-- pigeon on shoulder -->
+            <text x="26" y="178" font-size="15" style="animation:pigBob 2s ease-in-out infinite">🐦</text>
+            <!-- kebab in other hand -->
+            <line x1="70" y1="170" x2="85" y2="148" stroke="#6b3820" stroke-width="4" stroke-linecap="round"/>
+            <ellipse cx="82" cy="153" rx="7" ry="4" fill="#c8602a"/>
+            <ellipse cx="80" cy="160" rx="6" ry="3.5" fill="#a04520"/>
+
+            <!-- Reginald and SuperWyndfal at table listening -->
+            <!-- Reginald -->
+            <ellipse cx="140" cy="182" rx="18" ry="19" fill="#d8b880"/>
+            <path d="M125 170 Q129 152 140 148 Q151 152 155 170" fill="#2a1808"/>
+            <rect x="120" y="130" width="36" height="24" rx="3" fill="#3a2010"/>
+            <ellipse cx="140" cy="130" rx="18" ry="5" fill="#2a1808"/>
+            <!-- decent mustache -->
+            <path d="M124 197 Q130 192 138 193 Q141 195 140 193 Q139 191 146 191 Q153 190 158 196 Q153 201 146 198 Q140 200 140 198 Q139 196 138 199 Q130 202 124 197Z" fill="#8a5020"/>
+            <path d="M124 197 Q130 193 138 194" stroke="#a06030" stroke-width="1" fill="none"/>
+            <!-- SuperWyndfal listening intently -->
+            <ellipse cx="210" cy="178" rx="20" ry="21" fill="#e0c090"/>
+            <path d="M193 165 Q197 144 210 140 Q223 144 227 165" fill="#3a2010"/>
+            <!-- eyebrows raised: interested -->
+            <path d="M201 170 Q205 165 210 168" stroke="#3a2010" stroke-width="2.5" fill="none"/>
+            <path d="M210 168 Q215 165 219 170" stroke="#3a2010" stroke-width="2.5" fill="none"/>
+            <ellipse cx="203" cy="176" rx="4" ry="4.5" fill="#2b1d0e"/>
+            <ellipse cx="217" cy="176" rx="4" ry="4.5" fill="#2b1d0e"/>
+            <!-- mustache gleaming even in tavern -->
+            <g class="stache-glow" style="transform-origin:210px 188px">
+              <path d="M192 188 Q199 181 207 183 Q212 185 210 183 Q208 181 215 180 Q224 179 230 187 Q224 193 215 190 Q208 192 210 190 Q212 188 207 191 Q199 194 192 188Z" fill="#c8902a"/>
+            </g>
+          </svg>
+        </div>
+        <div class="spread-text">
+          <div class="ch-inhead"><span class="roman">Chapter II</span>Blood, Destiny, and a Scroll of Parchment</div>
+          <p><span class="dropcap">T</span>he word hung between them in the afternoon air. <em>Wyndfal.</em> The same name. The same blood. They repaired immediately to the nearest tavern.</p>
+          <p>They were not alone. Seated at the corner table, already in possession of a döner, a pigeon, and a scroll was a Turkish gentleman of formidable mustache and considerable composure: <strong>Evran</strong>, sometimes called Teberdar, the Kebab Master of the First Order.</p>
+          <div class="scroll-say vermilion"><span class="speaker">EVRAN</span>"I knew you would come. The pigeons told me a Wyndfal had been spotted on Merchant's Square. There are things I know that others do not."</div>
+          <div class="scroll-say"><span class="speaker">SUPERWYNDFAL</span>"You know of Reginald?"</div>
+          <div class="scroll-say vermilion"><span class="speaker">EVRAN</span>"I know of Mustachestan."</div>
+          <p>He unrolled the scroll. On it: a map. Mountains. A valley. A kingdom whose name was written in illuminated letters of gold and vermilion. <em>Mustachestan</em> — the hidden realm where mustache quality determines rank, nobility, destiny, and the very succession of the throne.</p>
+          <div class="scroll-say viridian"><span class="speaker">REGINALD VON WYNDFAL</span>"The throne has been empty for two years. Since the last king's mustache was lost in a wind incident."</div>
+          <div class="scroll-say"><span class="speaker">SUPERWYNDFAL</span>"I know something about wind incidents."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ COA DIVIDER 3 ═══ -->
+  <div class="coa-divider" data-r>
+    <svg viewBox="0 0 320 138" width="320" xmlns="http://www.w3.org/2000/svg">
+      <line x1="0" y1="67" x2="85" y2="67" stroke="#c8902a" stroke-width="1" opacity=".4"/>
+      <line x1="235" y1="67" x2="320" y2="67" stroke="#c8902a" stroke-width="1" opacity=".4"/>
+      <path d="M130 10 L190 10 L190 70 Q190 100 160 115 Q130 100 130 70 Z" fill="#7a1a20" stroke="#c8902a" stroke-width="2"/>
+      <g transform="translate(160,58)">
+        <path d="M-22 0 Q-15 -8 -8 -5 Q-3 -3 0 -5 Q3 -3 8 -5 Q15 -8 22 0 Q15 6 8 3 Q3 5 0 3 Q-3 5 -8 3 Q-15 6 -22 0Z" fill="#e8b840" transform="rotate(-20)"/>
+        <path d="M-22 0 Q-15 -8 -8 -5 Q-3 -3 0 -5 Q3 -3 8 -5 Q15 -8 22 0 Q15 6 8 3 Q3 5 0 3 Q-3 5 -8 3 Q-15 6 -22 0Z" fill="#e8b840" transform="rotate(20)"/>
+      </g>
+      <text x="118" y="78" font-size="18" style="animation:pigBob 2s ease-in-out infinite">🐦</text>
+      <!-- SuperWyndfal supporter silhouette added -->
+      <ellipse cx="202" cy="70" rx="11" ry="12" fill="#c8902a" opacity=".5"/>
+      <path d="M200 78 Q202 85 202 90" stroke="#c8902a" stroke-width="2" opacity=".4"/>
+      <path d="M115 118 Q160 128 205 118" fill="#e8d090" stroke="#c8902a" stroke-width="1"/>
+      <text x="160" y="126" text-anchor="middle" font-family="Cinzel,serif" font-size="7" fill="#7a1a20" letter-spacing="1">PER MUSTACHIO AD ASTRA</text>
+      <text x="160" y="22" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#c8902a" letter-spacing="2">CHAPTER THE THIRD</text>
+    </svg>
+  </div>
+
+  <!-- ═══ CHAPTER III — THE JOURNEY ═══ -->
+  <div class="chapter" data-r>
+    <div class="wide-spread">
+      <div class="wide-art">
+        <svg viewBox="0 0 560 210" width="100%" xmlns="http://www.w3.org/2000/svg" style="max-width:560px">
+          <!-- journey landscape — stylized -->
+          <defs>
+            <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#a0b8d0"/>
+              <stop offset="100%" stop-color="#c8b880"/>
+            </linearGradient>
+          </defs>
+          <rect width="560" height="210" fill="url(#sky)"/>
+          <!-- distant mountains -->
+          <path d="M0 160 L60 90 L120 130 L180 70 L240 120 L300 60 L360 110 L420 50 L480 100 L540 80 L560 90 L560 210 L0 210Z" fill="#8a9878"/>
+          <path d="M0 170 L80 120 L160 145 L260 105 L360 140 L460 95 L560 130 L560 210 L0 210Z" fill="#6a7858"/>
+          <!-- path / road -->
+          <path d="M10 210 Q100 195 200 198 Q300 195 400 200 Q480 198 555 210" stroke="#c8a860" stroke-width="4" fill="none" opacity=".7"/>
+          <!-- sign: MUSTACHESTAN 200 LEAGUES -->
+          <rect x="240" y="120" width="80" height="30" rx="3" fill="#f0e4c0" stroke="#c8902a" stroke-width="1.5"/>
+          <text x="280" y="131" text-anchor="middle" font-family="Cinzel,serif" font-size="6" fill="#7a1a20">MUSTACHESTAN</text>
+          <text x="280" y="142" text-anchor="middle" font-family="Cinzel,serif" font-size="6" fill="#c8902a">200 LEAGUES →</text>
+          <line x1="280" y1="150" x2="280" y2="175" stroke="#8a5820" stroke-width="3"/>
+          <!-- the group walking -->
+          <!-- SuperWyndfal leading, cape dramatic -->
+          <g style="animation:floatY 1.5s ease-in-out infinite">
+            <ellipse cx="120" cy="183" rx="16" ry="17" fill="#e0c090"/>
+            <path d="M107 171 Q111 153 120 150 Q129 153 133 171" fill="#3a2010"/>
+            <!-- mustache gleaming -->
+            <path d="M104 180 Q109 174 117 176 Q120 178 120 176 Q120 174 124 173 Q131 172 136 179 Q131 184 124 181 Q120 183 120 181 Q120 179 117 182 Q109 185 104 180Z" fill="#c8902a" class="stache-glow" style="transform-origin:120px 180px"/>
+            <rect x="106" y="193" width="28" height="20" rx="5" fill="#2563a8"/>
+            <!-- cape -->
+            <path d="M106 196 Q95 215 85 210" stroke="#1a3a6a" stroke-width="6" stroke-linecap="round" fill="none"/>
+          </g>
+          <!-- Reginald -->
+          <g style="animation:floatY 1.5s .2s ease-in-out infinite">
+            <ellipse cx="80" cy="186" rx="14" ry="15" fill="#d8b880"/>
+            <path d="M69 175 Q73 160 80 158 Q87 160 91 175" fill="#2a1808"/>
+            <rect x="63" y="146" width="28" height="20" rx="3" fill="#2a1808"/>
+            <ellipse cx="77" cy="146" rx="14" ry="4" fill="#1a0e06"/>
+            <path d="M67 183 Q73 178 79 179 Q81 181 80 179 Q79 177 84 177 Q90 176 94 182 Q90 186 84 183 Q80 185 80 183 Q79 181 73 184 Q67 187 67 183Z" fill="#8a5020"/>
+          </g>
+          <!-- Evran with kebab-staff and pigeon on shoulder -->
+          <g style="animation:floatY 1.5s .4s ease-in-out infinite">
+            <ellipse cx="50" cy="188" rx="13" ry="14" fill="#c8a060"/>
+            <path d="M39 177 Q43 163 50 161 Q57 163 61 177" fill="#4a2a10"/>
+            <line x1="40" y1="176" x2="28" y2="210" stroke="#6b3820" stroke-width="3" stroke-linecap="round"/>
+            <ellipse cx="32" cy="183" rx="5" ry="3" fill="#c8602a"/>
+            <ellipse cx="31" cy="189" rx="4.5" ry="3" fill="#a04520"/>
+            <text x="28" y="172" font-size="12" style="animation:pigBob 1.8s ease-in-out infinite">🐦</text>
+          </g>
+          <!-- HYDROPHILIC appeared — there's a stream, of course -->
+          <ellipse cx="400" cy="198" rx="50" ry="10" fill="#6090b0" opacity=".4"/>
+          <path d="M350 200 Q380 195 420 200 Q440 202 450 198" stroke="#00a0c0" stroke-width="2" fill="none" opacity=".5"/>
+          <g style="animation:floatY 1.5s .6s ease-in-out infinite">
+            <ellipse cx="400" cy="185" rx="14" ry="15" fill="#d0c0a0"/>
+            <path d="M388 174 Q392 161 400 159 Q408 161 412 174" fill="#2a3040"/>
+            <path d="M395 159 Q400 150 405 159 Q405 154 400 156 Q395 154 395 159Z" fill="#00c4e8" opacity=".8"/>
+            <!-- happy to find a stream -->
+            <path d="M394 183 Q400 187 406 183" stroke="#2b1d0e" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </g>
+          <text x="400" y="208" text-anchor="middle" font-family="Cinzel,serif" font-size="6" fill="#2a3040">"there is a stream here"</text>
+          <!-- decorative trees -->
+          <circle cx="450" cy="150" r="20" fill="#2a5a2a" opacity=".7"/>
+          <circle cx="475" cy="140" r="25" fill="#1a4a1a" opacity=".8"/>
+          <rect x="460" y="165" width="8" height="25" rx="2" fill="#4a2a10" opacity=".6"/>
+          <circle cx="510" cy="155" r="18" fill="#2a5a2a" opacity=".6"/>
+          <!-- the mountain of mustachestan in the distance — has a mustache-shaped peak -->
+          <path d="M420 80 Q430 55 445 40 Q450 60 443 72 Q455 50 465 30 Q470 55 460 70 Q472 48 482 28 Q485 55 473 72 Q485 50 490 35 Q495 55 484 72 Q490 55 500 40 Q505 65 494 80Z" fill="#7a1a20" opacity=".6"/>
+          <!-- crown on peak -->
+          <path d="M445 42 L447 35 L450 40 L455 30 L460 40 L463 35 L465 42Z" fill="#c8902a" opacity=".7" style="animation:glowG 2s ease-in-out infinite;transform-origin:455px 42px"/>
+        </svg>
+      </div>
+      <div class="wide-prose">
+        <div>
+          <div class="ch-inhead" style="margin-bottom:.8rem"><span class="roman">Chapter III</span>The Road to Mustachestan</div>
+          <p><span class="dropcap lapis">T</span>hey departed at dawn, three travelers and one pigeon. The route led through the Mountains of Chin, past the Valley of the Upper Lip, and across the Plains of the Philtrum — territories whose very names were drawn from the sacred geography of Mustachestan's founding mythology.</p>
+          <p>At the stream crossing, they found that <strong>Hydrophilic</strong> had, inexplicably, already arrived. He was standing in the water. He did not explain how he'd gotten ahead of them. He offered everyone a drink from his flask. Nobody refused. The water was, as always, excellent.</p>
+          <div class="scroll-say lapis"><span class="speaker">HYDROPHILIC</span>"This valley has very good water. The mineral content suggests ancient volcanic geology. Also there's apparently a kingdom nearby?"</div>
+          <div class="scroll-say vermilion"><span class="speaker">EVRAN</span>"There has always been a kingdom nearby. The pigeons have known for years. As have I."</div>
+        </div>
+        <div>
+          <p>The journey took three days, which was fast by any measure, and which SuperWyndfal attributed to the fact that his mustache seemed to act as a kind of compass, tugging slightly in the direction of other magnificent mustaches, like a dowsing rod for greatness.</p>
+          <p>At the frontier of Mustachestan, they were stopped by two guards. The guards took one look at SuperWyndfal's mustache and stood back without a word. One of them appeared to be quietly weeping.</p>
+          <div class="scroll-say"><span class="speaker">GUARD, COMPOSING HIMSELF</span>"Proceed, sir. Please... please just go in."</div>
+          <div class="scroll-say vermilion"><span class="speaker">EVRAN</span>"I told you."</div>
+          <div class="scroll-say"><span class="speaker">SUPERWYNDFAL</span>"You did."</div>
+          <div class="scroll-say vermilion"><span class="speaker">EVRAN</span>"I always tell people. They rarely listen initially."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ COA DIVIDER 4 ═══ -->
+  <div class="coa-divider" data-r>
+    <svg viewBox="0 0 320 140" width="320" xmlns="http://www.w3.org/2000/svg">
+      <line x1="0" y1="68" x2="82" y2="68" stroke="#c8902a" stroke-width="1" opacity=".4"/>
+      <line x1="238" y1="68" x2="320" y2="68" stroke="#c8902a" stroke-width="1" opacity=".4"/>
+      <!-- shield with basic crown now -->
+      <path d="M130 12 L190 12 L190 72 Q190 102 160 117 Q130 102 130 72 Z" fill="#7a1a20" stroke="#c8902a" stroke-width="2"/>
+      <path d="M140 12 L143 5 L148 11 L160 2 L172 11 L177 5 L180 12Z" fill="#c8902a"/>
+      <circle cx="160" cy="5" r="3" fill="#e8b840"/>
+      <g transform="translate(160,62)">
+        <path d="M-22 0 Q-15 -8 -8 -5 Q-3 -3 0 -5 Q3 -3 8 -5 Q15 -8 22 0 Q15 6 8 3 Q3 5 0 3 Q-3 5 -8 3 Q-15 6 -22 0Z" fill="#e8b840" transform="rotate(-20)"/>
+        <path d="M-22 0 Q-15 -8 -8 -5 Q-3 -3 0 -5 Q3 -3 8 -5 Q15 -8 22 0 Q15 6 8 3 Q3 5 0 3 Q-3 5 -8 3 Q-15 6 -22 0Z" fill="#e8b840" transform="rotate(20)"/>
+      </g>
+      <text x="112" y="82" font-size="18" style="animation:pigBob 2s ease-in-out infinite">🐦</text>
+      <ellipse cx="205" cy="68" rx="12" ry="13" fill="#c8902a" opacity=".5"/>
+      <path d="M115 120 Q160 130 205 120" fill="#e8d090" stroke="#c8902a" stroke-width="1"/>
+      <text x="160" y="128" text-anchor="middle" font-family="Cinzel,serif" font-size="7" fill="#7a1a20" letter-spacing="1">PER MUSTACHIO AD ASTRA</text>
+      <text x="160" y="24" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#c8902a" letter-spacing="2">CHAPTER THE FOURTH</text>
+    </svg>
+  </div>
+
+  <!-- ═══ CHAPTER IV — THE KINGDOM + SNARLDOR ═══ -->
+  <div class="chapter" data-r>
+    <div class="page-spread">
+      <div class="spread-inner">
+        <div class="spread-art">
+          <svg viewBox="0 0 260 290" width="260" xmlns="http://www.w3.org/2000/svg">
+            <!-- throne room -->
+            <rect width="260" height="290" fill="#c0a060"/>
+            <!-- grand hall columns -->
+            <rect x="15"  y="0" width="20" height="250" rx="4" fill="#a88840" stroke="#c8902a" stroke-width="1"/>
+            <rect x="225" y="0" width="20" height="250" rx="4" fill="#a88840" stroke="#c8902a" stroke-width="1"/>
+            <!-- column caps -->
+            <rect x="10"  y="55" width="30" height="8" rx="2" fill="#c8902a"/>
+            <rect x="220" y="55" width="30" height="8" rx="2" fill="#c8902a"/>
+            <rect x="10"  y="130" width="30" height="8" rx="2" fill="#c8902a"/>
+            <rect x="220" y="130" width="30" height="8" rx="2" fill="#c8902a"/>
+            <!-- throne platform -->
+            <rect x="60" y="190" width="140" height="20" rx="4" fill="#8a5820"/>
+            <rect x="80" y="175" width="100" height="20" rx="3" fill="#a07030"/>
+            <!-- EMPTY THRONE -->
+            <rect x="100" y="120" width="60" height="60" rx="6" fill="#c8902a" stroke="#e8b840" stroke-width="2"/>
+            <path d="M100 135 L95 115 L130 108 L160 120 L165 140" fill="#e8b840" opacity=".8"/>
+            <text x="130" y="155" text-anchor="middle" font-family="Cinzel,serif" font-size="7" fill="#7a1a20">VACANT</text>
+            <!-- ARCHIBALD THE WISPY — Grand Vizier -->
+            <ellipse cx="130" cy="88" rx="17" ry="18" fill="#d8c8a8"/>
+            <path d="M115 77 Q118 60 130 57 Q142 60 145 77" fill="#8a8878"/>
+            <!-- ancient wispy mustache — thin silver threads -->
+            <path d="M115 96 Q118 93 123 94 Q126 95 130 94 Q134 95 137 93 Q142 92 145 96" stroke="#d0d0c0" stroke-width="1.5" fill="none" opacity=".8"/>
+            <path d="M116 97 Q120 95 124 96 Q127 97 130 96" stroke="#e0e0d0" stroke-width=".8" fill="none" opacity=".6"/>
+            <!-- long wizardly robes -->
+            <rect x="112" y="105" width="36" height="55" rx="5" fill="#1a3a6a"/>
+            <!-- staff with mustache-shaped top -->
+            <line x1="148" y1="95" x2="158" y2="165" stroke="#8a5820" stroke-width="3" stroke-linecap="round"/>
+            <path d="M148 95 Q152 90 156 93 Q152 91 148 95" fill="#c8902a" opacity=".7"/>
+            <!-- COUNT SNARLDOR lurking on left — fake mustache visible if you look close -->
+            <ellipse cx="50" cy="195" rx="17" ry="18" fill="#b09080"/>
+            <path d="M36 182 Q40 163 50 160 Q60 163 64 182" fill="#2a1a10"/>
+            <!-- FAKE mustache — slightly crooked, one corner lifting -->
+            <path d="M35 200 Q40 195 48 196 Q52 198 50 196 Q48 194 56 194 Q63 193 67 200 Q62 205 55 202 Q51 204 50 202 Q49 200 47 203 Q40 206 35 200Z" fill="#2a1a10"/>
+            <!-- one edge is visibly peeling -->
+            <path d="M35 200 Q37 197 40 198" stroke="#c8b090" stroke-width="1.5" fill="none" opacity=".6"/>
+            <!-- sinister expression -->
+            <path d="M42 208 Q50 205 58 208" stroke="#2b1d0e" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+            <path d="M43 193 Q46 189 50 190" stroke="#2b1d0e" stroke-width="2" fill="none"/>
+            <path d="M50 190 Q54 189 57 193" stroke="#2b1d0e" stroke-width="2" fill="none"/>
+            <!-- villainous cape -->
+            <path d="M36 210 Q25 230 20 255 Q50 245 65 255 Q62 232 64 210" fill="#4a1a1a" opacity=".9"/>
+            <text x="50" y="272" text-anchor="middle" font-family="Cinzel,serif" font-size="5.5" fill="#7a1a20">COUNT SNARLDOR</text>
+            <text x="50" y="280" text-anchor="middle" font-family="Cinzel,serif" font-size="5" fill="#8a6040">(regent, suspicious)</text>
+            <!-- ROYAL BARBER in corner having a minor event -->
+            <ellipse cx="220" cy="200" rx="13" ry="14" fill="#d8c090"/>
+            <text x="220" y="222" text-anchor="middle" font-family="Cinzel,serif" font-size="5.5" fill="#8a6040">ROYAL BARBER</text>
+            <!-- scissors dropping from hands -->
+            <text x="215" y="218" font-size="10" style="animation:faint .5s ease-in-out 2s forwards">✂</text>
+            <!-- SuperWyndfal entering from bottom -->
+            <g style="animation:floatY 1.5s ease-in-out infinite">
+              <ellipse cx="185" cy="235" rx="17" ry="18" fill="#e0c090"/>
+              <path d="M171 222 Q175 204 185 200 Q195 204 199 222" fill="#3a2010"/>
+              <g class="stache-glow" style="transform-origin:185px 245px">
+                <path d="M168 245 Q175 238 183 240 Q186 242 185 240 Q184 238 191 237 Q199 236 205 244 Q199 250 191 247 Q185 249 185 247 Q184 245 183 248 Q175 251 168 245Z" fill="#c8902a"/>
+                <path d="M168 245 Q175 239 183 241 Q186 243 185 241" stroke="#e8b840" stroke-width="1.2" fill="none"/>
+              </g>
+              <!-- cape -->
+              <path d="M170 255 Q160 270 152 280 Q178 272 200 280 Q198 268 199 255" fill="#1a3a6a" style="animation:cape 3s ease-in-out infinite;transform-origin:185px 268px"/>
+            </g>
+          </svg>
+        </div>
+        <div class="spread-text">
+          <div class="ch-inhead"><span class="roman">Chapter IV</span>The Grand Vizier, the Empty Throne, and a Suspicious Regent</div>
+          <p><span class="dropcap">T</span>he throne room of Mustachestan was vast, tapestried, and smelled faintly of wax and grooming oils. At its center stood an empty throne. Before the throne stood <strong>Grand Vizier Archibald the Wispy</strong> — ninety-four years old, bearer of a mustache that had once been legendary and was now a thin silver thread of historical significance.</p>
+          <p>When he saw SuperWyndfal's mustache, Archibald put a hand over his heart and said nothing for eleven seconds.</p>
+          <div class="scroll-say lapis"><span class="speaker">ARCHIBALD THE WISPY, GRAND VIZIER</span>"At last. The Mustache has returned to Mustachestan."</div>
+          <p>From the left side of the hall, a figure stepped forward. <strong>Count Snarldor</strong>, Regent of Mustachestan, bearer of a mustache that was — and this had been suspected for some time, though never proven — <em>glued on</em>.</p>
+          <div class="scroll-say vermilion"><span class="speaker">COUNT SNARLDOR</span>"The throne of Mustachestan is not claimed by arrival. It is claimed by trial. I challenge this... newcomer to the Three Mustache Trials."</div>
+          <p>In the corner, the <strong>Royal Barber</strong> dropped his scissors.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CHAPTER V — THE TRIALS + SNARLDOR'S DOWNFALL ═══ -->
+  <div class="coa-divider" data-r>
+    <svg viewBox="0 0 320 140" width="320" xmlns="http://www.w3.org/2000/svg">
+      <line x1="0" y1="68" x2="80" y2="68" stroke="#c8902a" stroke-width="1" opacity=".4"/>
+      <line x1="240" y1="68" x2="320" y2="68" stroke="#c8902a" stroke-width="1" opacity=".4"/>
+      <path d="M130 12 L190 12 L190 72 Q190 102 160 117 Q130 102 130 72 Z" fill="#7a1a20" stroke="#c8902a" stroke-width="2.5"/>
+      <path d="M138 12 L141 4 L147 11 L160 1 L173 11 L179 4 L182 12Z" fill="#c8902a"/>
+      <circle cx="160" cy="4" r="4" fill="#e8b840" style="animation:glowG 2s ease-in-out infinite"/>
+      <g transform="translate(160,62)">
+        <path d="M-22 0 Q-15 -8 -8 -5 Q-3 -3 0 -5 Q3 -3 8 -5 Q15 -8 22 0 Q15 6 8 3 Q3 5 0 3 Q-3 5 -8 3 Q-15 6 -22 0Z" fill="#e8b840" transform="rotate(-20)" class="stache-glow" style="transform-origin:0px 0px"/>
+        <path d="M-22 0 Q-15 -8 -8 -5 Q-3 -3 0 -5 Q3 -3 8 -5 Q15 -8 22 0 Q15 6 8 3 Q3 5 0 3 Q-3 5 -8 3 Q-15 6 -22 0Z" fill="#e8b840" transform="rotate(20)" class="stache-glow" style="transform-origin:0px 0px"/>
+      </g>
+      <text x="112" y="82" font-size="18" style="animation:pigBob 2s ease-in-out infinite">🐦</text>
+      <ellipse cx="205" cy="66" rx="13" ry="14" fill="#c8902a" opacity=".6"/>
+      <path d="M115 120 Q160 130 205 120" fill="#e8d090" stroke="#c8902a" stroke-width="1"/>
+      <text x="160" y="128" text-anchor="middle" font-family="Cinzel,serif" font-size="7" fill="#7a1a20" letter-spacing="1">PER MUSTACHIO AD ASTRA</text>
+      <text x="160" y="24" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#c8902a" letter-spacing="2">CHAPTER THE FIFTH</text>
+    </svg>
+  </div>
+
+  <div class="chapter" data-r>
+    <div class="page-spread">
+      <div class="spread-inner flip">
+        <div class="spread-art">
+          <svg viewBox="0 0 260 290" width="260" xmlns="http://www.w3.org/2000/svg">
+            <!-- The moment of the fake mustache falling — DRAMATIC -->
+            <rect width="260" height="290" fill="#c0a060"/>
+            <!-- crowd lines -->
+            <rect x="0" y="220" width="260" height="70" fill="#a88840" opacity=".3"/>
+            <!-- crowd heads -->
+            <ellipse cx="20"  cy="235" rx="12" ry="13" fill="#c8a860" opacity=".7"/>
+            <ellipse cx="50"  cy="238" rx="11" ry="12" fill="#d8b880" opacity=".6"/>
+            <ellipse cx="200" cy="235" rx="12" ry="13" fill="#c8a860" opacity=".7"/>
+            <ellipse cx="230" cy="238" rx="11" ry="12" fill="#d8b880" opacity=".6"/>
+            <ellipse cx="115" cy="238" rx="11" ry="12" fill="#c8a060" opacity=".5"/>
+            <!-- gasping mouths on crowd -->
+            <ellipse cx="20"  cy="243" rx="4" ry="5" fill="#2b1d0e" opacity=".5"/>
+            <ellipse cx="50"  cy="246" rx="3" ry="4" fill="#2b1d0e" opacity=".4"/>
+            <ellipse cx="200" cy="242" rx="4" ry="5" fill="#2b1d0e" opacity=".5"/>
+            <!-- SNARLDOR — fake mustache is FALLING OFF -->
+            <ellipse cx="80" cy="155" rx="22" ry="23" fill="#b09080"/>
+            <path d="M61 141 Q65 120 80 116 Q95 120 99 141" fill="#2a1a10"/>
+            <!-- the falling fake mustache -->
+            <path d="M64 166 Q70 160 79 162 Q83 164 80 162 Q77 160 86 160 Q94 159 99 166" fill="#2a1a10" opacity=".6" style="animation:crumble 2s ease-in forwards"/>
+            <!-- the BARE UPPER LIP revealed below (horror) -->
+            <path d="M66 168 L94 168" stroke="#b09080" stroke-width="2" fill="none" opacity=".6"/>
+            <!-- Snarldor's horror face -->
+            <ellipse cx="74" cy="152" rx="4" ry="4.5" fill="#2b1d0e"/>
+            <ellipse cx="86" cy="152" rx="4" ry="4.5" fill="#2b1d0e"/>
+            <ellipse cx="80" cy="165" rx="5" ry="6" fill="#2b1d0e"/><!-- open mouth shock -->
+            <!-- glue residue above lip (damning evidence) -->
+            <path d="M68 168 Q75 165 80 166 Q85 165 92 168" stroke="#e8c090" stroke-width="2" fill="none" opacity=".5"/>
+            <text x="80" y="215" text-anchor="middle" font-family="Cinzel,serif" font-size="6" fill="#7a1a20">THE EVIDENCE</text>
+            <text x="80" y="222" text-anchor="middle" font-family="Cinzel,serif" font-size="5.5" fill="#8a6040">(adhesive residue noted)</text>
+            <!-- ARCHIBALD reacting — scandalized but not surprised -->
+            <ellipse cx="190" cy="155" rx="16" ry="17" fill="#d8c8a8"/>
+            <path d="M177 144 Q180 128 190 125 Q200 128 203 144" fill="#8a8878"/>
+            <path d="M176 162 Q180 159 185 160 Q188 162 190 161 Q192 162 195 160 Q200 158 204 162" stroke="#d0d0c0" stroke-width="1.5" fill="none" opacity=".8"/>
+            <!-- scandalized but told-you-so expression -->
+            <path d="M182 170 Q190 167 198 170" stroke="#2b1d0e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <!-- his staff raised -->
+            <line x1="200" y1="145" x2="215" y2="110" stroke="#8a5820" stroke-width="3" stroke-linecap="round"/>
+            <!-- ROYAL BARBER fainting spectacularly in background -->
+            <ellipse cx="195" cy="230" rx="14" ry="12" fill="#d8c090" style="animation:faint 1s ease-in .5s forwards"/>
+            <text x="195" y="255" text-anchor="middle" font-family="Cinzel,serif" font-size="5.5" fill="#8a6040">ROYAL BARBER</text>
+            <text x="195" y="262" text-anchor="middle" font-family="Cinzel,serif" font-size="5" fill="#8a6040">(fainting, 2nd time today)</text>
+            <!-- SuperWyndfal standing composed on right -->
+            <ellipse cx="140" cy="148" rx="18" ry="19" fill="#e0c090"/>
+            <path d="M125 136 Q129 117 140 114 Q151 117 155 136" fill="#3a2010"/>
+            <g class="stache-glow" style="transform-origin:140px 158px">
+              <path d="M123 158 Q130 151 138 153 Q141 155 140 153 Q139 151 146 150 Q154 149 160 157 Q154 163 146 160 Q140 162 140 160 Q139 158 138 161 Q130 164 123 158Z" fill="#c8902a"/>
+              <path d="M123 158 Q130 153 138 155 Q141 157 140 154" stroke="#e8b840" stroke-width="1.2" fill="none"/>
+            </g>
+            <!-- serene expression -->
+            <path d="M131 168 Q140 172 149 168" stroke="#2b1d0e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- pigeon (Evran's) perched nearby -->
+            <text x="115" y="125" font-size="14" style="animation:pigBob 2s ease-in-out infinite">🐦</text>
+          </svg>
+        </div>
+        <div class="spread-text">
+          <div class="ch-inhead"><span class="roman">Chapter V</span>The Three Trials, and The Fall of the Adhesive</div>
+          <p><span class="dropcap">T</span>he Three Mustache Trials were as follows: the Trial of Wind (withstanding a gale without flinching), the Trial of Gravity (holding a curl so perfect that a marble placed upon it would roll precisely to the tip), and the Trial of Recognition (being looked upon by the Royal Pigeon, who had never once been fooled).</p>
+          <p>SuperWyndfal completed all three with such ease that Archibald wept again, quietly, and did not apologize for it.</p>
+          <p>Snarldor attempted the Trial of Wind. The wind was not especially strong. But it was enough.</p>
+          <p>A corner lifted. Then another. By the time the gust had passed, Count Snarldor's mustache was hanging from one edge, trailing a visible line of dried adhesive, before detaching fully and drifting to the floor with the soft finality of a lie exposed.</p>
+          <div class="scroll-say lapis"><span class="speaker">ARCHIBALD THE WISPY</span>"...I suspected this. For two years I suspected this."</div>
+          <div class="scroll-say vermilion"><span class="speaker">EVRAN, FROM THE GALLERY</span>"I suspected it for longer. I know things."</div>
+          <p>Snarldor was escorted out by the pigeon guards, who were both extremely efficient and deeply judgmental. The Royal Barber fainted for the second time that day.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CHAPTER VI — MARIA ═══ -->
+  <div class="coa-divider" data-r>
+    <svg viewBox="0 0 320 140" width="320" xmlns="http://www.w3.org/2000/svg">
+      <line x1="0" y1="68" x2="78" y2="68" stroke="#c8902a" stroke-width="1" opacity=".5"/>
+      <line x1="242" y1="68" x2="320" y2="68" stroke="#c8902a" stroke-width="1" opacity=".5"/>
+      <path d="M130 12 L190 12 L190 72 Q190 102 160 117 Q130 102 130 72 Z" fill="#7a1a20" stroke="#c8902a" stroke-width="2.5"/>
+      <!-- fuller crown with jewels -->
+      <path d="M136 12 L139 3 L146 11 L160 0 L174 11 L181 3 L184 12Z" fill="#c8902a"/>
+      <circle cx="147" cy="9"  r="3.5" fill="#e83a2f"/>
+      <circle cx="160" cy="3"  r="4"   fill="#e8b840" style="animation:glowG 2s ease-in-out infinite"/>
+      <circle cx="173" cy="9"  r="3.5" fill="#0095f6"/>
+      <g transform="translate(160,62)">
+        <path d="M-24 0 Q-17 -10 -8 -6 Q-3 -4 0 -6 Q3 -4 8 -6 Q17 -10 24 0 Q17 8 8 5 Q3 7 0 5 Q-3 7 -8 5 Q-17 8 -24 0Z" fill="#e8b840" transform="rotate(-22)" class="stache-glow" style="transform-origin:0px 0px"/>
+        <path d="M-24 0 Q-17 -10 -8 -6 Q-3 -4 0 -6 Q3 -4 8 -6 Q17 -10 24 0 Q17 8 8 5 Q3 7 0 5 Q-3 7 -8 5 Q-17 8 -24 0Z" fill="#e8b840" transform="rotate(22)" class="stache-glow" style="transform-origin:0px 0px"/>
+      </g>
+      <text x="110" y="83" font-size="20" style="animation:pigBob 2s ease-in-out infinite">🐦</text>
+      <!-- both supporters now visible -->
+      <ellipse cx="208" cy="66" rx="13" ry="14" fill="#c8902a" opacity=".7"/>
+      <path d="M115 122 Q160 132 205 122" fill="#e8d090" stroke="#c8902a" stroke-width="1.2"/>
+      <text x="160" y="130" text-anchor="middle" font-family="Cinzel,serif" font-size="7" fill="#7a1a20" letter-spacing="1">PER MUSTACHIO AD ASTRA</text>
+      <text x="160" y="24" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#c8902a" letter-spacing="2">CHAPTER THE SIXTH</text>
+    </svg>
+  </div>
+
+  <div class="chapter" data-r>
+    <div class="page-spread">
+      <div class="spread-inner">
+        <div class="spread-art">
+          <svg viewBox="0 0 260 290" width="260" xmlns="http://www.w3.org/2000/svg">
+            <!-- grand hall, warm light, the meeting -->
+            <rect width="260" height="290" fill="#c8b070"/>
+            <!-- golden light from above -->
+            <ellipse cx="130" cy="60" rx="90" ry="60" fill="#e8c050" opacity=".2"/>
+            <!-- MARIA — from the left, regal entrance -->
+            <path d="M25 200 Q18 230 12 265 Q60 248 78 265 Q75 232 78 200" fill="#7a1a2e" style="animation:cape 3s ease-in-out .5s infinite;transform-origin:50px 233px"/>
+            <!-- Maria's dress/robe -->
+            <rect x="40" y="175" width="55" height="80" rx="8" fill="#7a1a2e"/>
+            <rect x="55" y="172" width="25" height="15" rx="4" fill="#5a1020"/>
+            <!-- Maria head -->
+            <ellipse cx="67" cy="150" rx="24" ry="26" fill="#d8b880"/>
+            <!-- her hair, elaborate -->
+            <path d="M45 142 Q48 120 55 115 Q60 125 58 132 Q63 118 65 108 Q70 120 68 128 Q73 112 78 108 Q80 120 77 128 Q82 115 88 112 Q88 124 84 132 Q89 120 92 128 Q90 140 86 145" fill="#3a2010"/>
+            <!-- crown on Maria -->
+            <path d="M52 142 L55 132 L60 140 L67 128 L74 140 L79 132 L82 142Z" fill="#c8902a"/>
+            <circle cx="67" cy="130" r="3" fill="#e8b840" style="animation:glowG 2s ease-in-out infinite"/>
+            <!-- MARIA'S MAGNIFICENT MUSTACHE — EQUAL TO SUPERWYNDFAL'S, DIFFERENT KEY -->
+            <g style="filter:drop-shadow(0 0 8px rgba(200,144,42,.7))">
+              <path d="M45 168 Q52 160 62 163 Q67 165 67 163 Q67 161 73 160 Q82 159 88 167 Q82 174 73 171 Q67 173 67 171 Q67 169 62 172 Q52 175 45 168Z" fill="#c8902a"/>
+              <path d="M45 168 Q52 162 62 165 Q67 167 67 164" stroke="#e8b840" stroke-width="1.5" fill="none"/>
+              <path d="M67 164 Q67 162 73 161 Q82 160 88 167" stroke="#e8b840" stroke-width="1.5" fill="none"/>
+            </g>
+            <!-- Maria's composed, equal expression -->
+            <ellipse cx="59" cy="155" rx="4.5" ry="5" fill="#2b1d0e"/>
+            <ellipse cx="75" cy="155" rx="4.5" ry="5" fill="#2b1d0e"/>
+            <circle cx="60.5" cy="153.5" r="1.8" fill="white"/>
+            <circle cx="76.5" cy="153.5" r="1.8" fill="white"/>
+            <!-- slight knowing smile -->
+            <path d="M58 178 Q67 183 76 178" stroke="#2b1d0e" stroke-width="2" fill="none" stroke-linecap="round"/>
+            <!-- SUPERWYNDFAL right side, equally regal -->
+            <path d="M183 200 Q176 228 168 258 Q200 244 218 258 Q216 228 218 200" fill="#1a3a6a" style="animation:cape 3s ease-in-out infinite;transform-origin:200px 229px"/>
+            <rect x="182" y="172" width="55" height="70" rx="8" fill="#2563a8"/>
+            <circle cx="210" cy="200" r="16" fill="#c8902a"/>
+            <text x="210" y="206" text-anchor="middle" font-family="serif" font-weight="900" font-size="18" fill="#1a0e06">S</text>
+            <ellipse cx="210" cy="148" rx="24" ry="26" fill="#e0c090"/>
+            <path d="M189 135 Q193 114 210 110 Q227 114 231 135" fill="#3a2010"/>
+            <ellipse cx="201" cy="146" rx="5" ry="5.5" fill="#2b1d0e"/>
+            <ellipse cx="219" cy="146" rx="5" ry="5.5" fill="#2b1d0e"/>
+            <circle cx="202.5" cy="144" r="2" fill="white"/>
+            <circle cx="220.5" cy="144" r="2" fill="white"/>
+            <g class="stache-glow" style="transform-origin:210px 163px">
+              <path d="M190 163 Q198 155 208 158 Q212 160 210 158 Q208 156 215 155 Q224 154 230 162 Q224 169 215 166 Q210 168 210 166 Q208 164 208 167 Q198 170 190 163Z" fill="#c8902a"/>
+              <path d="M190 163 Q198 157 208 160 Q212 162 210 159" stroke="#e8b840" stroke-width="1.5" fill="none"/>
+            </g>
+            <path d="M200 175 Q210 180 220 175" stroke="#2b1d0e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <!-- the MOMENT OF RECOGNITION between mustaches — golden glow between them -->
+            <ellipse cx="130" cy="162" rx="20" ry="12" fill="#e8b840" opacity=".12" style="animation:heartGlow 2s ease-in-out infinite"/>
+            <text x="130" y="157" text-anchor="middle" font-size="12" fill="#c8902a" opacity=".6" style="animation:glowG 2s ease-in-out infinite">✦</text>
+            <text x="130" y="170" text-anchor="middle" font-family="Cinzel,serif" font-size="6" fill="#c8902a" opacity=".7">EQUAL</text>
+          </svg>
+        </div>
+        <div class="spread-text">
+          <div class="ch-inhead"><span class="roman">Chapter VI</span>The Lady Maria, and the Recognition of Equals</div>
+          <p><span class="dropcap gold">T</span>hen the doors at the far end of the throne room opened, and <strong>Maria</strong> walked in.</p>
+          <p>She was the Duchess of the Eastern Provinces, daughter of the previous king's most trusted advisor, and heir to a mustache tradition stretching back eleven generations. She had been summoned, as Archibald explained, to attend the coronation as a matter of protocol.</p>
+          <p>She entered with the bearing of someone who had never doubted a single thing in her life, which was warranted, because her mustache was <em>extraordinary</em>.</p>
+          <p>Golden, perfectly curled, swept with architectural precision to two points that seemed to defy gravity through sheer confidence. It was neither superior nor inferior to SuperWyndfal's — it was simply equal in a different key. Like two great rivers that never merge, but recognize each other across a valley.</p>
+          <p>They looked at each other's mustaches for a long moment.</p>
+          <div class="scroll-say"><span class="speaker">SUPERWYNDFAL</span>"That is a magnificent mustache."</div>
+          <div class="scroll-say vermilion"><span class="speaker">MARIA</span>"So is yours."</div>
+          <p>Archibald began the betrothal paperwork before either of them had said another word. Some things, he explained to no one in particular, were simply obvious.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ CHAPTER VII — CORONATION & WEDDING ═══ -->
+  <div class="coa-divider" data-r>
+    <svg viewBox="0 0 320 145" width="320" xmlns="http://www.w3.org/2000/svg">
+      <!-- THE FULL COAT OF ARMS — complete and glorious -->
+      <line x1="0" y1="70" x2="72" y2="70" stroke="#c8902a" stroke-width="1.5" opacity=".6"/>
+      <line x1="248" y1="70" x2="320" y2="70" stroke="#c8902a" stroke-width="1.5" opacity=".6"/>
+      <!-- main shield -->
+      <path d="M128 12 L192 12 L192 75 Q192 108 160 122 Q128 108 128 75 Z" fill="#7a1a20" stroke="#c8902a" stroke-width="2.5"/>
+      <!-- border within shield -->
+      <path d="M135 18 L185 18 L185 73 Q185 100 160 113 Q135 100 135 73 Z" fill="none" stroke="#e8b840" stroke-width="1.5" opacity=".5"/>
+      <!-- full crown with jewels -->
+      <path d="M133 12 L137 2 L145 11 L160 -1 L175 11 L183 2 L187 12Z" fill="#c8902a"/>
+      <circle cx="145" cy="8"  r="4" fill="#e83a2f"/>
+      <circle cx="160" cy="1"  r="5" fill="#e8b840" style="animation:glowG 1.5s ease-in-out infinite"/>
+      <circle cx="175" cy="8"  r="4" fill="#0095f6"/>
+      <!-- the crossed mustaches — larger and more elaborate -->
+      <g transform="translate(160,65)">
+        <path d="M-26 0 Q-18 -12 -8 -7 Q-3 -5 0 -7 Q3 -5 8 -7 Q18 -12 26 0 Q18 9 8 6 Q3 8 0 6 Q-3 8 -8 6 Q-18 9 -26 0Z" fill="#e8b840" transform="rotate(-22)" class="stache-glow" style="transform-origin:0px 0px"/>
+        <path d="M-26 0 Q-18 -12 -8 -7 Q-3 -5 0 -7 Q3 -5 8 -7 Q18 -12 26 0 Q18 9 8 6 Q3 8 0 6 Q-3 8 -8 6 Q-18 9 -26 0Z" fill="#e8b840" transform="rotate(22)" class="stache-glow" style="transform-origin:0px 0px"/>
+      </g>
+      <!-- pigeon supporter left -->
+      <text x="105" y="88" font-size="22" style="animation:pigBob 2s ease-in-out infinite">🐦</text>
+      <!-- SuperWyndfal silhouette right — with cape and S -->
+      <ellipse cx="215" cy="72" rx="16" ry="17" fill="#c8902a" opacity=".7"/>
+      <path d="M200 80 Q198 100 196 115 Q210 108 220 115 Q218 100 218 80" fill="#1a3a6a" opacity=".6"/>
+      <text x="215" y="77" text-anchor="middle" font-family="serif" font-size="10" fill="#e8b840" font-weight="900">S</text>
+      <!-- Maria silhouette left -->
+      <ellipse cx="105" cy="72" rx="15" ry="16" fill="#c8902a" opacity=".65"/>
+      <path d="M92 80 Q90 100 88 115 Q102 108 112 115 Q110 100 112 80" fill="#7a1a2e" opacity=".6"/>
+      <path d="M98 65 L100 58 L104 64 L108 56 L112 64 L115 58 L117 65Z" fill="#c8902a" opacity=".6"/>
+      <!-- motto scroll — grander -->
+      <path d="M112 126 Q160 138 208 126" fill="#f0e4c0" stroke="#c8902a" stroke-width="1.5"/>
+      <text x="160" y="135" text-anchor="middle" font-family="Cinzel,serif" font-size="7.5" fill="#7a1a20" letter-spacing="1.5">PER MUSTACHIO AD ASTRA</text>
+      <text x="160" y="26" text-anchor="middle" font-family="Cinzel,serif" font-size="8" fill="#c8902a" letter-spacing="2">CHAPTER THE LAST</text>
+    </svg>
+  </div>
+
+  <div class="chapter" data-r>
+    <div class="wide-spread">
+      <div class="wide-art">
+        <svg viewBox="0 0 560 220" width="100%" xmlns="http://www.w3.org/2000/svg" style="max-width:560px">
+          <!-- coronation scene - everyone present -->
+          <defs>
+            <linearGradient id="hg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#e8c860" stop-opacity=".4"/>
+              <stop offset="100%" stop-color="#c8a850" stop-opacity=".1"/>
+            </linearGradient>
+          </defs>
+          <rect width="560" height="220" fill="#c0a050"/>
+          <rect width="560" height="220" fill="url(#hg)"/>
+          <!-- grand columns -->
+          <rect x="0"   y="0" width="22" height="180" rx="4" fill="#a08840" stroke="#c8902a" stroke-width="1"/>
+          <rect x="538" y="0" width="22" height="180" rx="4" fill="#a08840" stroke="#c8902a" stroke-width="1"/>
+          <rect x="100" y="0" width="16" height="180" rx="3" fill="#a08840" opacity=".6"/>
+          <rect x="444" y="0" width="16" height="180" rx="3" fill="#a08840" opacity=".6"/>
+          <!-- banners hanging -->
+          <rect x="28"  y="0" width="30" height="70" rx="2" fill="#7a1a20"/>
+          <path d="M58 68 L73 75 L58 82" fill="#c8902a"/>
+          <rect x="502" y="0" width="30" height="70" rx="2" fill="#7a1a20"/>
+          <path d="M502 68 L487 75 L502 82" fill="#c8902a"/>
+          <!-- mustache motif on banners -->
+          <path d="M32 30 Q37 25 42 27 Q44 28 43 27 Q42 26 47 26 Q52 25 56 30 Q52 34 47 32 Q43 33 43 32 Q42 31 42 33 Q37 35 32 30Z" fill="#e8b840" opacity=".8"/>
+          <path d="M506 30 Q511 25 516 27 Q518 28 517 27 Q516 26 521 26 Q526 25 530 30 Q526 34 521 32 Q517 33 517 32 Q516 31 516 33 Q511 35 506 30Z" fill="#e8b840" opacity=".8"/>
+
+          <!-- THRONE — now occupied -->
+          <rect x="218" y="50" width="124" height="120" rx="8" fill="#c8902a" stroke="#e8b840" stroke-width="2.5"/>
+          <path d="M218 70 L208 45 L280 35 L352 50 L342 75" fill="#e8b840" opacity=".8"/>
+          <!-- jewels on throne -->
+          <circle cx="225" cy="55" r="5" fill="#e83a2f"/>
+          <circle cx="280" cy="40" r="6" fill="#e8b840"/>
+          <circle cx="335" cy="55" r="5" fill="#0095f6"/>
+
+          <!-- SUPERWYNDFAL on throne with crown -->
+          <ellipse cx="280" cy="115" rx="24" ry="26" fill="#e0c090"/>
+          <path d="M260 100 Q264 78 280 74 Q296 78 300 100" fill="#3a2010"/>
+          <!-- THE CROWN on SuperWyndfal -->
+          <path d="M263 96 L266 85 L272 94 L280 81 L288 94 L294 85 L297 96Z" fill="#c8902a" style="animation:glowG 2s ease-in-out infinite;transform-origin:280px 96px"/>
+          <circle cx="272" cy="91" r="3.5" fill="#e83a2f"/>
+          <circle cx="280" cy="84" r="4.5" fill="#e8b840"/>
+          <circle cx="288" cy="91" r="3.5" fill="#0095f6"/>
+          <!-- eyes beaming -->
+          <ellipse cx="272" cy="114" rx="5" ry="5.5" fill="#2b1d0e"/>
+          <ellipse cx="288" cy="114" rx="5" ry="5.5" fill="#2b1d0e"/>
+          <circle cx="273.5" cy="112" r="2" fill="white"/>
+          <circle cx="289.5" cy="112" r="2" fill="white"/>
+          <!-- GLORIOUS MUSTACHE — king now -->
+          <g class="stache-glow" style="transform-origin:280px 126px">
+            <path d="M258 127 Q267 118 277 121 Q281 123 280 121 Q279 119 286 118 Q296 117 304 126 Q296 133 286 130 Q280 132 280 130 Q279 128 277 131 Q267 134 258 127Z" fill="#c8902a"/>
+            <path d="M258 127 Q267 120 277 123 Q281 125 280 122" stroke="#e8b840" stroke-width="1.8" fill="none"/>
+            <path d="M280 122 Q279 120 286 119 Q296 118 304 126" stroke="#e8b840" stroke-width="1.8" fill="none"/>
+          </g>
+          <path d="M268 140 Q280 147 292 140" stroke="#2b1d0e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+          <!-- MARIA beside throne — equally crowned -->
+          <ellipse cx="370" cy="118" rx="22" ry="24" fill="#d8b880"/>
+          <path d="M351 105 Q355 85 370 81 Q385 85 389 105" fill="#3a2010"/>
+          <path d="M354 100 L357 89 L363 98 L370 85 L377 98 L383 89 L386 100Z" fill="#c8902a" style="animation:glowG 2.2s ease-in-out .2s infinite;transform-origin:370px 100px"/>
+          <circle cx="363" cy="95" r="3" fill="#0095f6"/>
+          <circle cx="370" cy="88" r="4" fill="#e8b840"/>
+          <circle cx="377" cy="95" r="3" fill="#e83a2f"/>
+          <!-- Maria's mustache -->
+          <g style="filter:drop-shadow(0 0 8px rgba(200,144,42,.8))">
+            <path d="M351 131 Q358 123 368 126 Q372 128 370 126 Q368 124 375 123 Q384 122 390 130 Q384 137 375 134 Q370 136 370 134 Q368 132 368 135 Q358 138 351 131Z" fill="#c8902a"/>
+            <path d="M351 131 Q358 125 368 128 Q372 130 370 127" stroke="#e8b840" stroke-width="1.5" fill="none"/>
+          </g>
+          <ellipse cx="362" cy="117" rx="4.5" ry="5" fill="#2b1d0e"/>
+          <ellipse cx="378" cy="117" rx="4.5" ry="5" fill="#2b1d0e"/>
+          <circle cx="363.5" cy="115" r="1.8" fill="white"/>
+          <circle cx="379.5" cy="115" r="1.8" fill="white"/>
+          <path d="M360 142 Q370 147 380 142" stroke="#2b1d0e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+
+          <!-- ASSEMBLED GUESTS below -->
+          <!-- Archibald with staff raised blessing -->
+          <ellipse cx="170" cy="165" rx="16" ry="17" fill="#d8c8a8"/>
+          <path d="M158 154 Q161 138 170 135 Q179 138 182 154" fill="#8a8878"/>
+          <path d="M155 171 Q160 167 165 168 Q168 170 170 169 Q172 170 175 168 Q180 166 185 171" stroke="#d0d0c0" stroke-width="1.5" fill="none"/>
+          <line x1="183" y1="148" x2="196" y2="118" stroke="#8a5820" stroke-width="3" stroke-linecap="round"/>
+          <path d="M183 148 Q187 143 191 146 Q187 144 183 148" fill="#c8902a" opacity=".7"/>
+          <text x="170" y="190" text-anchor="middle" font-family="Cinzel,serif" font-size="6" fill="#8a6040">ARCHIBALD</text>
+          <!-- Reginald — proudly wearing his lesser mustache with dignity -->
+          <ellipse cx="130" cy="167" rx="14" ry="15" fill="#d8b880"/>
+          <path d="M119 157 Q122 144 130 142 Q138 144 141 157" fill="#2a1808"/>
+          <rect x="118" y="128" width="24" height="18" rx="2" fill="#3a2010"/>
+          <ellipse cx="130" cy="128" rx="12" ry="4" fill="#2a1808"/>
+          <path d="M117 175 Q123 170 129 171 Q131 173 130 171 Q129 169 135 169 Q141 168 145 174 Q141 179 135 176 Q130 178 130 176 Q129 174 129 177 Q123 180 117 175Z" fill="#8a5020"/>
+          <text x="130" y="191" text-anchor="middle" font-family="Cinzel,serif" font-size="6" fill="#8a6040">REGINALD</text>
+          <text x="130" y="199" text-anchor="middle" font-family="Cinzel,serif" font-size="5" fill="#8a6040">Royal Cousin</text>
+          <!-- Evran with kebab raised like a scepter, pigeon on shoulder -->
+          <ellipse cx="90" cy="165" rx="14" ry="15" fill="#c8a060"/>
+          <path d="M78 154 Q82 140 90 138 Q98 140 102 154" fill="#4a2a10"/>
+          <text x="67" y="160" font-size="14" style="animation:pigBob 2s ease-in-out infinite">🐦</text>
+          <line x1="100" y1="152" x2="112" y2="130" stroke="#6b3820" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="110" cy="134" rx="6" ry="4" fill="#c8602a"/>
+          <text x="90" y="190" text-anchor="middle" font-family="Cinzel,serif" font-size="6" fill="#c4a35a">EVRAN</text>
+          <!-- Hydrophilic with celebratory water fountain -->
+          <ellipse cx="455" cy="165" rx="14" ry="15" fill="#d0c0a0"/>
+          <path d="M443 154 Q447 140 455 138 Q463 140 467 154" fill="#2a3040"/>
+          <path d="M450 138 Q455 130 460 138 Q460 134 455 136 Q450 134 450 138Z" fill="#00c4e8" opacity=".8"/>
+          <!-- water fountain from hands - celebratory -->
+          <path d="M455 150 Q465 130 455 118" stroke="#00c4e8" stroke-width="2" fill="none" opacity=".6" style="animation:floatY 1.5s ease-in-out infinite"/>
+          <path d="M455 150 Q468 140 472 128" stroke="#00c4e8" stroke-width="1.5" fill="none" opacity=".5" style="animation:floatY 1.5s .3s ease-in-out infinite"/>
+          <text x="455" y="190" text-anchor="middle" font-family="Cinzel,serif" font-size="6" fill="#00c4e8">HYDROPHILIC</text>
+          <!-- Royal Barber, still pale, but standing -->
+          <ellipse cx="490" cy="168" rx="12" ry="13" fill="#d8c090"/>
+          <text x="490" y="192" text-anchor="middle" font-family="Cinzel,serif" font-size="5.5" fill="#8a6040">ROYAL BARBER</text>
+          <text x="490" y="199" text-anchor="middle" font-family="Cinzel,serif" font-size="5" fill="#8a6040">(recovered)</text>
+          <!-- golden light rays from the throne -->
+          <line x1="280" y1="60" x2="100" y2="0"  stroke="#e8b840" stroke-width="1" opacity=".1"/>
+          <line x1="280" y1="60" x2="460" y2="0"  stroke="#e8b840" stroke-width="1" opacity=".1"/>
+          <line x1="280" y1="60" x2="10"  y2="120" stroke="#e8b840" stroke-width="1" opacity=".08"/>
+          <line x1="280" y1="60" x2="550" y2="120" stroke="#e8b840" stroke-width="1" opacity=".08"/>
+        </svg>
+      </div>
+      <div class="wide-prose">
+        <div>
+          <div class="ch-inhead" style="margin-bottom:.8rem"><span class="roman">The Final Chapter</span>The Coronation, the Wedding, and the Happily Ever After</div>
+          <p><span class="dropcap gold">T</span>he coronation of <strong>SuperWyndfal, King of Mustachestan</strong>, took place three days later in the Grand Hall of the Upper Lip, before a congregation of twelve hundred citizens and approximately forty pigeons, all of whom Evran seemed to know personally.</p>
+          <p>Archibald placed the Crown of the Magnified Curl upon SuperWyndfal's head with trembling, reverent hands. The crown was ancient. It fit perfectly. It could not have fit anyone else — the crown, like all things in Mustachestan, was attuned to the mustache of its wearer.</p>
+          <div class="scroll-say lapis"><span class="speaker">ARCHIBALD THE WISPY, GRAND VIZIER</span>"By the law of the Upper Lip, by the Covenant of the Curl, by the Sacred Clasp of the Golden Tip — I crown thee, SuperWyndfal, King of Mustachestan. Long may it grow."</div>
+          <div class="scroll-say"><span class="speaker">ALL PRESENT</span>"Long may it grow."</div>
+        </div>
+        <div>
+          <p>The wedding followed immediately afterward. <strong>Reginald</strong> served as Best Cousin, wearing his good-but-lesser mustache with the quiet dignity of a man who knows exactly where he stands and finds that standing perfectly acceptable. He was made <em>Royal Cousin of the First Order</em>, which was a title Archibald invented on the spot.</p>
+          <p><strong>Hydrophilic</strong> produced a celebratory fountain from his palms that arced over the entire hall. Nobody had asked him to. Nobody objected.</p>
+          <div class="scroll-say vermilion"><span class="speaker">EVRAN</span>"I knew this would happen. The pigeons knew years ago. I tried to tell people. Nobody listens until it is already true."</div>
+          <p>SuperWyndfal and Maria stood before the altar. They looked at each other. Then at each other's mustaches. Then at each other again. They understood each other completely and without ambiguity.</p>
+          <p>The Royal Barber, now recovered, wept so profusely during the ceremony that Hydrophilic had to quietly remove him before the floor became a concern.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ EPILOGUE ══════════════════ -->
+<div class="epilogue" data-r>
+  <div class="epi-card">
+    <!-- mustache ornament top -->
+    <svg width="100" height="28" viewBox="0 0 100 28" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:0 auto 1.5rem;animation:glowG 3s ease-in-out infinite">
+      <path d="M3 14 Q8 6 16 9 Q22 11 25 9 Q29 7 34 8 Q39 9 42 6 Q45 9 50 8 Q55 9 58 6 Q61 8 66 8 Q71 7 75 9 Q78 11 84 9 Q92 6 97 14 Q92 20 84 17 Q78 19 75 17 Q71 15 66 18 Q61 20 58 17 Q55 15 50 18 Q45 15 42 17 Q39 20 34 18 Q29 15 25 17 Q22 19 16 17 Q8 20 3 14Z" fill="#c8902a"/>
+      <path d="M3 14 Q8 8 16 10 Q22 12 25 10 Q29 8 34 9 Q39 10 42 7" stroke="#e8b840" stroke-width="1.2" fill="none"/>
+      <path d="M42 7 Q45 10 50 9 Q55 10 58 7 Q61 9 66 9 Q71 8 75 10 Q78 12 84 10 Q92 8 97 14" stroke="#e8b840" stroke-width="1.2" fill="none"/>
+    </svg>
+
+    <div class="epi-title">Happily Ever After</div>
+    <div class="epi-body">
+      SuperWyndfal and Maria ruled Mustachestan with equal wisdom and equal mustaches for many years thereafter. The kingdom flourished. The mustache tradition was preserved, codified, and expanded into a twelve-volume encyclopedia authored primarily by <em>Evran</em>, who had been waiting for someone to ask him to write it for years and who dedicated it to his pigeons.<br><br>
+      <strong>Reginald</strong> served faithfully as Royal Cousin of the First Order. He tended his good-but-lesser mustache with meticulous care, and was respected by all for the grace with which he occupied his exact place in the hierarchy of mustaches.<br><br>
+      <em>Archibald the Wispy</em> retired at the age of ninety-seven with the title Grand Vizier Emeritus. His silver-thread mustache was preserved in the Royal Museum, behind glass, with a small plaque reading: <em>"It was once magnificent. It remembers."</em><br><br>
+      <strong>Hydrophilic</strong> was appointed Royal Hydrologist of Mustachestan, a position created specifically so that someone would stop him producing unauthorized indoor fountains. It worked approximately forty percent of the time.<br><br>
+      The <em>Royal Barber</em> fainted three more times in the first year of the reign, each time upon seeing the King and Queen's mustaches in the morning light. He considered this a privilege.
+    </div>
+
+    <div style="margin-top:2rem;text-align:center">
+      <svg width="60" height="20" viewBox="0 0 60 20" xmlns="http://www.w3.org/2000/svg">
+        <path d="M2 10 Q6 4 11 6 Q14 8 15 6 Q17 5 20 5 Q23 6 25 4 Q27 6 30 5 Q33 6 35 4 Q37 5 40 5 Q43 6 45 6 Q46 8 49 6 Q54 4 58 10 Q54 15 49 13 Q46 14 45 12 Q43 14 40 13 Q37 11 35 14 Q33 15 30 13 Q27 11 25 14 Q23 15 20 13 Q17 11 15 12 Q14 14 11 12 Q6 15 2 10Z" fill="#c8902a" opacity=".4"/>
+      </svg>
+    </div>
+
+    <div class="epi-motto">Per Mustachio Ad Astra &nbsp;·&nbsp; Through the Mustache, to the Stars</div>
+  </div>
+</div>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.08 });
+document.querySelectorAll('[data-r], .chapter, .coa-divider, .epilogue').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
