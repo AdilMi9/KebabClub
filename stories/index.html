@@ -139,6 +139,21 @@ const REACTIONS = [
 ];
 const TAGS = ['LEGEND','FAIL','CRINGE','EPIC'];
 
+// ============================================================
+// FEATURED — самостоятельные html-страницы (не из Supabase).
+// Открываются в новой вкладке по прямой ссылке.
+// Добавь сюда объект, чтобы прикрепить ещё одну такую страницу.
+// ============================================================
+const FEATURED = [
+  {
+    tag: 'CHRONICLE',
+    author: 'Royal Scribe',
+    preview: 'The Chronicle of Mustachestan — the full illuminated saga of pigeons, kebab, and one truly magnificent mustache.',
+    url: 'chronicle-of-mustachestan.html'
+  }
+];
+// ============================================================
+
 let currentUser = null;
 let isAdmin = false;
 let selectedTag = 'LEGEND';
@@ -250,10 +265,25 @@ async function renderList(){
 
   document.getElementById('countLabel').textContent = stories.length + (stories.length===1?' entry':' entries');
   const feedEl = document.getElementById('feed');
-  if(stories.length === 0){ feedEl.innerHTML = '<div class="empty">Nothing logged yet.</div>'; return; }
+
+  const featuredHtml = FEATURED.map(f => `
+    <a class="story-card" href="${f.url}" target="_blank" rel="noopener">
+      <div class="thumb"></div>
+      <div class="body">
+        <div class="story-meta">
+          <span class="pill">${esc(f.tag)}</span>
+          <span>${esc(f.author)}</span>
+        </div>
+        <div class="story-preview">${esc(f.preview)}</div>
+      </div>
+    </a>
+  `).join('');
+
+  if(stories.length === 0 && FEATURED.length === 0){ feedEl.innerHTML = '<div class="empty">Nothing logged yet.</div>'; return; }
+  if(stories.length === 0){ feedEl.innerHTML = featuredHtml; return; }
 
   const total = stories.length;
-  feedEl.innerHTML = stories.map((s,idx)=>{
+  feedEl.innerHTML = featuredHtml + stories.map((s,idx)=>{
     const num = total - idx;
     const thumb = (s.attachments||[]).find(a=>a.kind==='image');
     const date = new Date(s.created_at);
