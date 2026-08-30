@@ -447,19 +447,20 @@ async function renderForm(existingId){
     };
   }
 
-  function renderQuoteRows(){
-    return draft.quotes.map((q,i)=>`
-      <div class="quote-row" data-i="${i}">
-        <textarea placeholder="Quote text…" class="quoteText">${esc(q.text)}</textarea>
-        <div class="qtools">
-          <button type="button" class="ghost recordBtn">🎙️ Record audio</button>
-          <label class="ghost" style="cursor:pointer;">📎 Upload audio<input type="file" accept="audio/*" class="audioFile" style="display:none;"></label>
-          <span class="who audioStatus">${q.audioFile ? q.audioFile.name : (q.existingUrl ? 'has audio' : 'no audio')}</span>
-          ${draft.quotes.length > 1 ? '<button type="button" class="ghost removeQuote">Remove</button>' : ''}
-        </div>
-      </div>
-    `).join('');
-  }
+	function renderQuoteRows(){
+	  return draft.quotes.map((q,i)=>`
+		<div class="quote-row" data-i="${i}">
+		  <textarea placeholder="Quote text…" class="quoteText">${esc(q.text)}</textarea>
+		  <div class="qtools">
+			<button type="button" class="ghost recordBtn">🎙️ Record audio</button>
+			<label class="ghost" style="cursor:pointer;">📎 Upload audio<input type="file" accept="audio/*" class="audioFile" style="display:none;"></label>
+			<span class="who audioStatus">${q.audioFile ? q.audioFile.name : (q.existingUrl ? 'has audio' : 'no audio')}</span>
+			${(q.audioFile || q.existingUrl) ? '<button type="button" class="ghost removeAudio">Remove audio</button>' : ''}
+			${draft.quotes.length > 1 ? '<button type="button" class="ghost removeQuote">Remove</button>' : ''}
+		  </div>
+		</div>
+	  `).join('');
+	}
 
   function renderExistingPhotos(){
     return draft.existingPhotos.map((p,i)=>`
@@ -534,6 +535,15 @@ async function renderForm(existingId){
         document.getElementById('quoteRows').innerHTML = renderQuoteRows();
         bindQuoteRowEvents();
       });
+	  const removeAudioBtn = row.querySelector('.removeAudio');
+      if(removeAudioBtn){
+        removeAudioBtn.addEventListener('click', ()=>{
+          draft.quotes[i].audioFile = null;
+          draft.quotes[i].existingUrl = null;
+          document.getElementById('quoteRows').innerHTML = renderQuoteRows();
+          bindQuoteRowEvents();
+        });
+      }
     });
   }
   bindQuoteRowEvents();
@@ -603,7 +613,7 @@ async function renderForm(existingId){
       }
       if(result.error) throw result.error;
 
-      location.href = `index.html?id=${result.data.id}`;
+      location.href = `index.html?id=${existingId || result.data.id}`;
     }catch(e){
       console.error(e);
       hint.textContent = "Couldn't save — check console / Supabase config.";
