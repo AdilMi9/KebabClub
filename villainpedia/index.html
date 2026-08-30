@@ -493,6 +493,7 @@ async function renderForm(existingId){
       </div>
 
       <button class="btn primary" id="saveBtn">${existingId ? 'Save changes' : 'Create file'}</button>
+		${existingId ? '<button class="btn danger" id="deleteBtn" type="button">Delete file</button>' : ''}
       <div class="form-hint" id="formHint"></div>
     </div>
   `;
@@ -609,6 +610,20 @@ async function renderForm(existingId){
       document.getElementById('saveBtn').disabled = false;
     }
   });
+  const deleteBtn = document.getElementById('deleteBtn');
+if(deleteBtn){
+  deleteBtn.addEventListener('click', async ()=>{
+    if(!confirm('Delete this character permanently? This cannot be undone.')) return;
+    deleteBtn.disabled = true;
+    const { error } = await sb.from('characters').delete().eq('id', existingId);
+    if(error){
+      document.getElementById('formHint').textContent = 'Could not delete — try again.';
+      deleteBtn.disabled = false;
+      return;
+    }
+    location.href = 'index.html';
+  });
+}
 }
 
 // ---------- router ----------
