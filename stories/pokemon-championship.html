@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Grand Mustachestan Pokémon Championship</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Barlow+Condensed:ital,wght@0,700;0,800;1,700&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#06080e;
+  --panel:#0d1018;
+  --border:#1a2030;
+  --red:#e63e2f;
+  --blue:#3b82f6;
+  --yellow:#fbbf24;
+  --green:#10b981;
+  --purple:#8b5cf6;
+  --cyan:#06b6d4;
+  --orange:#f97316;
+  --cream:#f0ede8;
+  --dim:#4a5568;
+  --fire:#ff5e1a;
+  --water:#0ea5e9;
+  --psychic:#d946ef;
+  --ghost:#7c3aed;
+  --dragon:#4338ca;
+  --fairy:#ec4899;
+  --steel:#94a3b8;
+  --dark:#292524;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--void);font-family:'IBM Plex Mono',monospace;color:var(--cream);overflow-x:hidden;}
+
+/* scanlines */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.05) 3px,rgba(0,0,0,.05) 4px);}
+
+/* ══════════ COVER ══════════ */
+.cover{min-height:100vh;background:radial-gradient(ellipse at 50% 60%,#0d1830 0%,#06080e 70%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:2rem;position:relative;overflow:hidden;}
+
+/* animated star field */
+.stars{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.star-dot{position:absolute;background:white;border-radius:50%;animation:twinkle var(--d,3s) ease-in-out var(--dl,0s) infinite;}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:1;transform:scale(1.5)}}
+
+.cover-pixel{font-family:'Press Start 2P',monospace;font-size:clamp(.5rem,.9vw,.75rem);
+  letter-spacing:1px;color:var(--yellow);text-align:center;line-height:2;margin-bottom:1.5rem;
+  text-shadow:0 0 20px rgba(251,191,36,.4);}
+
+.cover-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;
+  font-size:clamp(2.5rem,10vw,6rem);letter-spacing:-1px;line-height:.95;text-align:center;
+  color:var(--cream);text-shadow:3px 3px 0 var(--red),6px 6px 0 rgba(230,62,47,.3);}
+.cover-title .poke{color:var(--yellow);text-shadow:3px 3px 0 #b45309,6px 6px 0 rgba(180,83,9,.3);}
+
+.cover-sub{font-family:'IBM Plex Mono',monospace;font-size:.72rem;letter-spacing:2px;
+  color:var(--dim);margin-top:1rem;text-align:center;}
+.cover-sub em{color:var(--cyan);font-style:normal;}
+
+/* Pokeball decoration */
+.pokeball{width:80px;height:80px;border-radius:50%;position:relative;margin-bottom:1.5rem;
+  background:linear-gradient(180deg,var(--red) 50%,white 50%);
+  border:4px solid #333;animation:spin 6s linear infinite;}
+.pokeball::before{content:'';position:absolute;top:50%;left:0;right:0;height:4px;background:#333;transform:translateY(-50%);}
+.pokeball::after{content:'';position:absolute;top:50%;left:50%;width:18px;height:18px;
+  background:white;border:4px solid #333;border-radius:50%;transform:translate(-50%,-50%);
+  box-shadow:inset 0 0 0 4px #555;}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+.scroll-cue{margin-top:2.5rem;font-family:'Press Start 2P',monospace;font-size:.5rem;
+  letter-spacing:2px;color:var(--dim);animation:blink 1s step-end infinite;}
+@keyframes blink{50%{opacity:0}}
+
+/* ══════════ REVEAL ══════════ */
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+
+/* ══════════ STRUCTURE ══════════ */
+.arena{max-width:980px;margin:0 auto;padding:0 1rem 6rem;}
+
+/* section divider */
+.section-div{text-align:center;padding:3rem 0 2rem;opacity:0;transform:translateY(16px);
+  transition:opacity .5s ease,transform .5s ease;}
+.section-div.vis{opacity:1;transform:translateY(0);}
+.section-div .round-label{font-family:'Press Start 2P',monospace;font-size:clamp(.5rem,.8vw,.65rem);
+  color:var(--yellow);letter-spacing:3px;display:block;margin-bottom:.5rem;
+  text-shadow:0 0 15px rgba(251,191,36,.5);}
+.section-div .round-title{font-family:'Barlow Condensed',sans-serif;font-weight:800;
+  font-size:clamp(1.5rem,4vw,2.8rem);color:var(--cream);letter-spacing:-0.5px;}
+
+/* ══════════ BATTLE CARD ══════════ */
+.battle-card{background:var(--panel);border:1px solid var(--border);margin-bottom:2rem;
+  position:relative;overflow:hidden;}
+/* accent line */
+.battle-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--bar,var(--yellow));}
+
+/* HP BAR SECTION */
+.hp-bars{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--border);
+  background:rgba(0,0,0,.3);}
+.hp-side{padding:.8rem 1.2rem;}
+.hp-side.right{text-align:right;}
+.hp-trainer{font-family:'Press Start 2P',monospace;font-size:.45rem;letter-spacing:1px;margin-bottom:.3rem;}
+.hp-name{font-family:'Press Start 2P',monospace;font-size:.55rem;margin-bottom:.4rem;}
+.hp-bar-wrap{height:8px;background:#1a1a2a;border-radius:4px;overflow:hidden;position:relative;}
+.hp-bar-inner{height:100%;border-radius:4px;width:var(--hp,100%);
+  background:linear-gradient(90deg,var(--hpc1,#10b981),var(--hpc2,#34d399));
+  transition:width 1s ease;position:relative;overflow:hidden;}
+.hp-bar-inner::after{content:'';position:absolute;top:0;left:-60px;width:40px;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.3),transparent);
+  animation:hpShine 2s ease infinite;}
+@keyframes hpShine{from{left:-60px}to{left:120%}}
+.hp-val{font-family:'Press Start 2P',monospace;font-size:.38rem;color:#b0cbf9;margin-top:.2rem;}
+.hp-side.right .hp-bar-wrap{direction:rtl;}
+
+/* BATTLE FIELD */
+.battle-field{display:grid;grid-template-columns:1fr 1fr;min-height:260px;}
+.battle-art{background:var(--void);display:flex;align-items:center;justify-content:center;
+  padding:1.2rem;position:relative;overflow:hidden;border-right:1px solid var(--border);}
+
+/* MOVE ANNOUNCER */
+.move-announce{background:rgba(0,0,0,.5);border-left:3px solid var(--bar,var(--yellow));
+  padding:.5rem 1rem;margin:.3rem 0;position:relative;}
+.move-announce .move-name{font-family:'Press Start 2P',monospace;font-size:.48rem;
+  color:var(--bar,var(--yellow));letter-spacing:1px;display:block;margin-bottom:.2rem;}
+.move-announce .move-desc{font-size:.82rem;line-height:1.7;color:#b0b8c8;}
+.move-announce .move-desc em{color:var(--cream);font-style:normal;}
+.move-announce .move-desc strong{color:var(--bar,var(--yellow));}
+
+/* COMMENTARY box */
+.commentary{padding:1.2rem 1.4rem;display:flex;flex-direction:column;gap:.5rem;justify-content:center;}
+
+/* dialogue */
+.line{border-left:2px solid var(--border);padding:.3rem .8rem;font-size:.82rem;
+  font-style:italic;color:#8090a8;margin:.1rem 0;}
+.line .who{font-family:'Press Start 2P',monospace;font-style:normal;font-size:.38rem;
+  letter-spacing:1px;display:block;margin-bottom:.1rem;}
+.line.ignite{border-color:var(--fire);}.line.ignite .who{color:var(--fire);}
+.line.hydro{border-color:var(--water);}.line.hydro .who{color:var(--water);}
+.line.evran{border-color:var(--yellow);}.line.evran .who{color:var(--yellow);}
+.line.ana{border-color:var(--psychic);}.line.ana .who{color:var(--psychic);}
+.line.lapi{border-color:var(--cyan);}.line.lapi .who{color:var(--cyan);}
+.line.whisp{border-color:var(--green);}.line.whisp .who{color:var(--green);}
+.line.violet{border-color:var(--dragon);}.line.violet .who{color:var(--dragon);}
+.line.rolex{border-color:var(--yellow);}.line.rolex .who{color:#fde68a;}
+.line.anduin{border-color:var(--purple);}.line.anduin .who{color:var(--purple);}
+.line.jowisz{border-color:#4ade80;}.line.jowisz .who{color:#4ade80;}
+.line.burz{border-color:var(--steel);}.line.burz .who{color:var(--steel);}
+.line.blood{border-color:#ef4444;}.line.blood .who{color:#ef4444;}
+.line.tista{border-color:#fca5a5;}.line.tista .who{color:#fca5a5;}
+.line.comm{border-color:var(--dim);}.line.comm .who{color:var(--dim);}
+.line.sw{border-color:var(--steel);}.line.sw .who{color:var(--steel);}
+
+/* TYPE BADGE */
+.type-badge{display:inline-block;font-family:'Press Start 2P',monospace;font-size:.35rem;
+  padding:.15rem .4rem;border-radius:3px;margin:0 .15rem;letter-spacing:.5px;vertical-align:middle;}
+.tb-fire{background:#c2410c;color:#fed7aa;}
+.tb-water{background:#075985;color:#bae6fd;}
+.tb-psychic{background:#86198f;color:#f5d0fe;}
+.tb-ghost{background:#4c1d95;color:#ddd6fe;}
+.tb-dragon{background:#1e40af;color:#bfdbfe;}
+.tb-steel{background:#374151;color:#e5e7eb;}
+.tb-fairy{background:#9d174d;color:#fce7f3;}
+.tb-normal{background:#374151;color:#d1d5db;}
+.tb-dark{background:#1c1917;color:#d6d3d1;}
+
+/* WIDE BATTLE (full scene) */
+.wide-battle{background:var(--panel);border:1px solid var(--border);margin-bottom:2rem;position:relative;overflow:hidden;}
+.wide-battle::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--bar,var(--red));}
+.wide-battle-art{background:var(--void);border-bottom:1px solid var(--border);
+  min-height:230px;display:flex;align-items:center;justify-content:center;padding:1.2rem;overflow:hidden;}
+.wide-battle-prose{display:grid;grid-template-columns:1fr 1fr;gap:2rem;padding:1.5rem;}
+.wide-battle-prose p{font-size:.85rem;line-height:1.9;color:#8090a8;}
+.wide-battle-prose p em{color:var(--cream);font-style:normal;}
+.wide-battle-prose p strong{color:var(--yellow);}
+
+/* WINNER BANNER */
+.winner-banner{background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.3);
+  padding:.6rem 1.2rem;display:flex;align-items:center;gap:1rem;
+  border-top:1px solid var(--border);}
+.winner-banner .w-label{font-family:'Press Start 2P',monospace;font-size:.45rem;
+  letter-spacing:2px;color:var(--green);}
+.winner-banner .w-name{font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  font-size:1.1rem;color:var(--cream);}
+.winner-banner .w-poke{font-family:'Press Start 2P',monospace;font-size:.5rem;color:#b0cbf9;}
+.winner-banner.draw{background:rgba(59,130,246,.08);border-color:rgba(59,130,246,.25);}
+.winner-banner.draw .w-label{color:var(--blue);}
+
+/* ANIMATIONS */
+@keyframes floatY{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+@keyframes zap{0%,100%{opacity:0;transform:scaleX(0)}15%{opacity:1;transform:scaleX(1)}85%{opacity:1;transform:scaleX(1)}100%{opacity:0;transform:scaleX(0)}}
+@keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+@keyframes glow{0%,100%{filter:drop-shadow(0 0 4px var(--gcolor,#fbbf24))}50%{filter:drop-shadow(0 0 16px var(--gcolor,#fbbf24))}}
+@keyframes appear{from{opacity:0;transform:scale(.3) rotate(-10deg)}to{opacity:1;transform:scale(1) rotate(0deg)}}
+
+/* ══════════ EPILOGUE ══════════ */
+.epilogue{max-width:980px;margin:0 auto;padding:4rem 1rem 7rem;text-align:center;
+  opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease;}
+.epilogue.vis{opacity:1;transform:translateY(0);}
+.epi-pixel{font-family:'Press Start 2P',monospace;font-size:clamp(.5rem,.8vw,.65rem);
+  color:var(--yellow);line-height:2.2;text-shadow:0 0 15px rgba(251,191,36,.4);margin-bottom:1.5rem;}
+.epi-body{max-width:660px;margin:0 auto;font-size:.85rem;line-height:2;color:#94b5ef;}
+.epi-body em{color:var(--cream);font-style:italic;}
+.epi-body strong{color:var(--yellow);}
+
+/* RESPONSIVE */
+@media(max-width:600px){
+  .battle-field,.hp-bars,.wide-battle-prose,.battle-card .grid-2{grid-template-columns:1fr;}
+  .battle-art{border-right:none;border-bottom:1px solid var(--border);}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ COVER ══════════ -->
+<div class="cover">
+  <div class="stars" id="stars"></div>
+  <div class="pokeball"></div>
+  <div class="cover-pixel">
+    ★ THE GRAND MUSTACHESTAN ★<br>
+    POKEMON CHAMPIONSHIP<br>
+    SEASON I · OPEN BRACKET
+  </div>
+  <div class="cover-title">WILD<br><span class="poke">BATTLE</span><br>APPEARED!</div>
+  <div class="cover-sub">All trainers. All Pokémon. One <em>real pigeon</em>.</div>
+  <div class="scroll-cue">▼ PRESS START ▼</div>
+</div>
+
+<!-- ══════════ ARENA ══════════ -->
+<div class="arena">
+
+<!-- ═══ INTRO ═══ -->
+<div class="section-div" data-r>
+  <span class="round-label">OPENING CEREMONY</span>
+  <div class="round-title">Evran Announces the Tournament</div>
+</div>
+
+<div class="battle-card reveal" data-r style="--bar:var(--yellow)">
+  <div class="commentary" style="grid-column:1/-1;padding:1.5rem 2rem">
+    <p style="font-size:.85rem;line-height:1.9;color:#8090a8">The announcement came on a Tuesday — hand-delivered by pigeon, which everyone agreed was fitting. A scroll arrived at each gang member's door bearing the crest of Mustachestan (crossed mustaches, crowned) and the words, in Evran's unmistakable script:</p>
+    <div class="move-announce" style="margin:1rem 0;--bar:var(--yellow)">
+      <span class="move-name">ROYAL PROCLAMATION</span>
+      <span class="move-desc">By order of King SuperWyndfal the Magnificent, the First Grand Mustachestan Pokémon Championship is hereby announced. All trainers and their companions are invited to compete. <em>Venue: The Grand Arena of the Upper Lip. Date: This Saturday. Refreshments: Kebab. Presiding: Evran, Tournament Master, Kebab Master, Keeper of Secrets.</em></span>
+    </div>
+    <div class="line ignite"><span class="who">IGNITE</span>"bro. BRO. I have been preparing for this my entire life. charizard is READY."</div>
+    <div class="line hydro"><span class="who">HYDROPHILIC</span>"I've been training Blastoise every morning with fresh mineral water for six months. He is extremely well-hydrated and also very powerful."</div>
+    <div class="line ignite"><span class="who">IGNITE</span>"hydro you are going to LOSE to me so badly."</div>
+    <div class="line hydro"><span class="who">HYDROPHILIC</span>"Ignite. Fire versus Water. Think about this."</div>
+    <div class="line ignite"><span class="who">IGNITE</span>"I refuse to think about this."</div>
+    <div class="line evran"><span class="who">EVRAN, on the tournament roster</span>"I have entered myself. I have entered Tista as my partner. Tista — if you lose in the first round I will bite your tits."</div>
+    <div class="line tista"><span class="who">TISTA</span>"...noted."</div>
+    <p style="font-size:.82rem;line-height:1.9;color:#6a7585;margin-top:.8rem"><em>Ana read the scroll once, then went back to staring at the wall. Her name was on the bracket. She had, apparently, registered. She did not remember doing this. She would participate nonetheless.</em></p>
+  </div>
+</div>
+
+<!-- ═══ ROUND 1 ═══ -->
+<div class="section-div" data-r>
+  <span class="round-label">ROUND 1 · BATTLE 01</span>
+  <div class="round-title">Ignite vs. Hydrophilic</div>
+</div>
+
+<div class="battle-card reveal" data-r style="--bar:var(--fire)">
+  <div class="hp-bars">
+    <div class="hp-side">
+      <div class="hp-trainer" style="color:var(--fire)">IGNITE</div>
+      <div class="hp-name">CHARIZARD <span class="type-badge tb-fire">FIRE</span></div>
+      <div class="hp-bar-wrap"><div class="hp-bar-inner" style="--hp:28%;--hpc1:#ef4444;--hpc2:#f97316"></div></div>
+      <div class="hp-val">HP: 28/100 (critical)</div>
+    </div>
+    <div class="hp-side right">
+      <div class="hp-trainer" style="color:var(--water)">HYDROPHILIC</div>
+      <div class="hp-name">BLASTOISE <span class="type-badge tb-water">WATER</span></div>
+      <div class="hp-bar-wrap"><div class="hp-bar-inner" style="--hp:72%;--hpc1:#0ea5e9;--hpc2:#38bdf8"></div></div>
+      <div class="hp-val">HP: 72/100</div>
+    </div>
+  </div>
+  <div class="battle-field">
+    <div class="battle-art" style="border-right-color:rgba(255,94,26,.2)">
+      <svg viewBox="0 0 260 230" width="260" xmlns="http://www.w3.org/2000/svg">
+        <!-- stadium floor tiles -->
+        <rect width="260" height="230" fill="#080c14"/>
+        <line x1="0" y1="200" x2="260" y2="200" stroke="#1a2030" stroke-width="1"/>
+        <!-- arena glow -->
+        <ellipse cx="130" cy="200" rx="120" ry="25" fill="#ff5e1a" opacity=".07"/>
+        <!-- CHARIZARD — battered but still standing, defiant -->
+        <g style="animation:floatY 1.8s ease-in-out infinite">
+          <!-- body -->
+          <ellipse cx="75" cy="160" rx="30" ry="35" fill="#e07030"/>
+          <!-- wings (damaged) -->
+          <path d="M48 145 Q28 118 18 100 Q35 110 52 125" fill="#c85820" opacity=".8"/>
+          <path d="M102 145 Q122 118 132 100 Q115 110 98 125" fill="#c85820" opacity=".6"/>
+          <!-- head -->
+          <ellipse cx="75" cy="108" rx="22" ry="24" fill="#e07030"/>
+          <!-- one eye determined -->
+          <ellipse cx="67" cy="106" rx="5" ry="5.5" fill="#2b1d0e"/>
+          <ellipse cx="83" cy="106" rx="5" ry="5.5" fill="#2b1d0e"/>
+          <circle cx="68.5" cy="104.5" r="2" fill="white"/>
+          <circle cx="84.5" cy="104.5" r="2" fill="white"/>
+          <!-- flame tail (still burning proud) -->
+          <path d="M75 190 Q80 200 75 215" stroke="#e07030" stroke-width="6" stroke-linecap="round" fill="none"/>
+          <path d="M70 212 Q75 200 80 215 Q77 205 75 210 Q73 205 70 212Z" fill="#ff6030" style="animation:floatY .7s ease-in-out infinite;transform-origin:75px 212px"/>
+          <!-- water dripping from losing -->
+          <ellipse cx="60" cy="130" rx="2" ry="4" fill="#0ea5e9" opacity=".5"/>
+          <ellipse cx="90" cy="140" rx="2" ry="4" fill="#0ea5e9" opacity=".4"/>
+          <!-- fire aura -->
+          <ellipse cx="75" cy="155" rx="35" ry="45" fill="#ff5e1a" opacity=".06" style="animation:pulse 2s ease-in-out infinite"/>
+        </g>
+        <!-- BLASTOISE — confident, cannons out -->
+        <g style="animation:floatY 1.8s .3s ease-in-out infinite">
+          <!-- shell -->
+          <ellipse cx="185" cy="155" rx="35" ry="38" fill="#2a3a8a"/>
+          <!-- shell detail -->
+          <ellipse cx="185" cy="155" rx="28" ry="30" fill="none" stroke="#3a5ac0" stroke-width="1.5" opacity=".6"/>
+          <!-- body/head -->
+          <ellipse cx="185" cy="115" rx="25" ry="27" fill="#4a6ab0"/>
+          <ellipse cx="175" cy="112" rx="5" ry="5.5" fill="#2b1d0e"/>
+          <ellipse cx="195" cy="112" rx="5" ry="5.5" fill="#2b1d0e"/>
+          <circle cx="176.5" cy="110.5" r="2" fill="white"/>
+          <circle cx="196.5" cy="110.5" r="2" fill="white"/>
+          <!-- confident expression -->
+          <path d="M175 124 Q185 129 195 124" stroke="#2b1d0e" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- CANNONS blasting water -->
+          <rect x="150" y="95" width="14" height="28" rx="4" fill="#2a2a5a" transform="rotate(-30,157,109)"/>
+          <rect x="207" y="95" width="14" height="28" rx="4" fill="#2a2a5a" transform="rotate(30,214,109)"/>
+          <!-- water blasts -->
+          <path d="M142 88 Q125 75 108 65" stroke="#0ea5e9" stroke-width="4" stroke-linecap="round" fill="none" opacity=".7" style="animation:zap 1.5s ease-in-out infinite"/>
+          <path d="M222 88 Q235 78 245 70" stroke="#0ea5e9" stroke-width="3" stroke-linecap="round" fill="none" opacity=".5" style="animation:zap 1.5s ease-in-out .3s infinite"/>
+          <!-- water aura -->
+          <ellipse cx="185" cy="150" rx="40" ry="48" fill="#0ea5e9" opacity=".05" style="animation:pulse 2s ease-in-out infinite"/>
+        </g>
+        <!-- VS -->
+        <text x="130" y="165" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="10" fill="white" opacity=".8">VS</text>
+        <!-- arena field lines -->
+        <ellipse cx="130" cy="205" rx="100" ry="15" fill="#1a2030" opacity=".6"/>
+      </svg>
+    </div>
+    <div class="commentary">
+      <div class="move-announce" style="--bar:var(--fire)">
+        <span class="move-name">CHARIZARD used SEISMIC TOSS!</span>
+        <span class="move-desc">Ignite, refusing to accept the type matchup, orders Charizard to grab Blastoise and hurl it from 400 feet. <em>This is a flying move. It hits. Ignite celebrates prematurely.</em></span>
+      </div>
+      <div class="move-announce" style="--bar:var(--water)">
+        <span class="move-name">BLASTOISE used HYDRO PUMP!</span>
+        <span class="move-desc">During <em>every</em> turn break, Hydrophilic hand-delivers a fresh bottle of mineral water to Blastoise's side of the field. "Stay hydrated, buddy." <strong>Blastoise crits. It's super effective.</strong></span>
+      </div>
+      <div class="line ignite"><span class="who">IGNITE</span>"THIS IS RIGGED. FIRE IS STRONGER THAN WATER. THIS IS WRONG."</div>
+      <div class="line hydro"><span class="who">HYDROPHILIC</span>"Ignite that's not how types work—"</div>
+      <div class="line ignite"><span class="who">IGNITE</span>"I KNOW how types work I just REJECT it."</div>
+      <div class="line hydro"><span class="who">HYDROPHILIC (after winning)</span>"Hey. Hey Charizard. Here's some water. You did great. You need to stay hydrated."</div>
+      <div class="line ignite"><span class="who">IGNITE</span>"don't give my charizard water. don't you DARE—"</div>
+    </div>
+  </div>
+  <div class="winner-banner" style="--bar:var(--water)">
+    <div>
+      <div class="w-label">WINNER</div>
+      <div class="w-name">Hydrophilic</div>
+    </div>
+    <div class="w-poke">BLASTOISE · Type advantage + superior hydration strategy</div>
+  </div>
+</div>
+
+<!-- ═══ ROUND 1 · BATTLE 02 ═══ -->
+<div class="section-div" data-r>
+  <span class="round-label">ROUND 1 · BATTLE 02</span>
+  <div class="round-title">Ana vs. Anduin</div>
+</div>
+
+<div class="battle-card reveal" data-r style="--bar:var(--psychic)">
+  <div class="hp-bars">
+    <div class="hp-side">
+      <div class="hp-trainer" style="color:var(--psychic)">ANA</div>
+      <div class="hp-name">SLOWKING <span class="type-badge tb-psychic">PSYCHIC</span></div>
+      <div class="hp-bar-wrap"><div class="hp-bar-inner" style="--hp:94%;--hpc1:#a855f7;--hpc2:#d946ef"></div></div>
+      <div class="hp-val">HP: 94/100 (barely scratched)</div>
+    </div>
+    <div class="hp-side right">
+      <div class="hp-trainer" style="color:var(--purple)">ANDUIN</div>
+      <div class="hp-name">DRAGONITE <span class="type-badge tb-dragon">DRAGON</span></div>
+      <div class="hp-bar-wrap"><div class="hp-bar-inner" style="--hp:12%;--hpc1:#ef4444;--hpc2:#f97316"></div></div>
+      <div class="hp-val">HP: 12/100 (critical)</div>
+    </div>
+  </div>
+  <div class="battle-field">
+    <div class="battle-art" style="border-right-color:rgba(217,70,239,.2)">
+      <svg viewBox="0 0 260 230" width="260" xmlns="http://www.w3.org/2000/svg">
+        <rect width="260" height="230" fill="#080c14"/>
+        <!-- ANA'S SLOWKING — staring entirely sideways at nothing -->
+        <g style="animation:floatY 2.5s ease-in-out infinite">
+          <!-- body -->
+          <ellipse cx="70" cy="160" rx="28" ry="30" fill="#d080b0"/>
+          <!-- Slowking shell/collar -->
+          <ellipse cx="70" cy="145" rx="20" ry="14" fill="#c85020"/>
+          <!-- head -->
+          <ellipse cx="70" cy="118" rx="22" ry="24" fill="#d080b0"/>
+          <!-- crown -->
+          <path d="M58 108 L61 98 L66 106 L70 95 L74 106 L79 98 L82 108Z" fill="#c85020"/>
+          <circle cx="70" cy="97" r="5" fill="#ff6090"/>
+          <!-- STARING SIDEWAYS — both eyes looking completely to the right at nothing -->
+          <ellipse cx="62" cy="115" rx="6" ry="6.5" fill="#2b1d0e"/>
+          <ellipse cx="78" cy="115" rx="6" ry="6.5" fill="#2b1d0e"/>
+          <circle cx="67" cy="113" r="2.5" fill="white"/>
+          <circle cx="83" cy="113" r="2.5" fill="white"/>
+          <!-- stare direction line (off to the right, off screen) -->
+          <line x1="84" y1="114" x2="260" y2="114" stroke="#d946ef" stroke-width="1" stroke-dasharray="6 4" opacity=".25"/>
+          <!-- psychic aura emanating regardless -->
+          <ellipse cx="70" cy="140" rx="40" ry="50" fill="#d946ef" opacity=".05" style="animation:pulse 3s ease-in-out infinite"/>
+          <!-- psyshock rings (happening automatically) -->
+          <ellipse cx="70" cy="140" rx="20" ry="25" fill="none" stroke="#d946ef" stroke-width="1.5" opacity=".4" style="animation:floatY 1.5s ease-in-out infinite"/>
+        </g>
+        <!-- ANDUIN'S DRAGONITE — trying to make friends instead of fight -->
+        <g style="animation:floatY 1.8s .3s ease-in-out infinite">
+          <!-- body -->
+          <ellipse cx="185" cy="158" rx="30" ry="32" fill="#e8a020"/>
+          <!-- wings small cute -->
+          <path d="M158 145 Q142 130 148 118 Q158 132 163 142" fill="#c87810" opacity=".7"/>
+          <path d="M212 145 Q228 130 222 118 Q212 132 207 142" fill="#c87810" opacity=".7"/>
+          <!-- head -->
+          <ellipse cx="185" cy="115" rx="24" ry="26" fill="#e8a020"/>
+          <!-- friendly eyes -->
+          <ellipse cx="175" cy="112" rx="6" ry="6.5" fill="#2b1d0e"/>
+          <ellipse cx="195" cy="112" rx="6" ry="6.5" fill="#2b1d0e"/>
+          <circle cx="176.5" cy="110" r="2.5" fill="white"/>
+          <circle cx="196.5" cy="110" r="2.5" fill="white"/>
+          <!-- big friendly smile, waving at Slowking -->
+          <path d="M174 128 Q185 135 196 128" stroke="#2b1d0e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <!-- arm waving at Slowking -->
+          <path d="M157 148 Q142 138 135 128" stroke="#e8a020" stroke-width="8" stroke-linecap="round" fill="none"/>
+          <!-- battered from psychic hits despite not fighting -->
+          <path d="M178 100 Q185 105 192 100" stroke="#c87810" stroke-width="1" fill="none" opacity=".4"/>
+          <!-- hurt swirls -->
+          <text x="162" y="95" font-size="12" fill="#fbbf24" opacity=".5">★</text>
+          <text x="200" y="100" font-size="10" fill="#fbbf24" opacity=".4">★</text>
+        </g>
+        <text x="130" y="175" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="9" fill="white" opacity=".7">VS</text>
+        <ellipse cx="130" cy="205" rx="105" ry="14" fill="#1a2030" opacity=".5"/>
+      </svg>
+    </div>
+    <div class="commentary">
+      <div class="move-announce" style="--bar:var(--psychic)">
+        <span class="move-name">SLOWKING is... staring?</span>
+        <span class="move-desc">Ana's Slowking enters the battlefield and immediately turns to look at something to the right — a support pillar, as far as the judges can tell. It does not look at Dragonite once during the entire battle. <em>It uses Psyshock automatically on turn 2.</em> <strong>It's devastating.</strong></span>
+      </div>
+      <div class="move-announce" style="--bar:var(--purple)">
+        <span class="move-name">DRAGONITE used... wave?</span>
+        <span class="move-desc">Anduin instructs Dragonite to use Dragon Rush. Dragonite instead waves at Slowking. Anduin is charmed by this. They have a moment. <em>Psyshock hits Dragonite during the moment.</em></span>
+      </div>
+      <div class="line anduin"><span class="who">ANDUIN</span>"wait are we— is the battle happening? I thought we were just meeting!"</div>
+      <div class="line ana"><span class="who">ANA (not looking at the battle)</span>"the pillar has seventeen horizontal cracks. I'm counting them."</div>
+      <div class="line anduin"><span class="who">ANDUIN</span>"Slowking is so cool though, I love it, can we be friends after—"</div>
+      <div class="line comm"><span class="who">REFEREE</span>"Dragonite is unable to battle. Slowking wins."</div>
+      <div class="line anduin"><span class="who">ANDUIN</span>"that's okay, honestly Slowking was great, I'm really happy for both of them."</div>
+      <div class="line ana"><span class="who">ANA</span>"eighteen. I miscounted."</div>
+    </div>
+  </div>
+  <div class="winner-banner">
+    <div>
+      <div class="w-label">WINNER</div>
+      <div class="w-name">Ana</div>
+    </div>
+    <div class="w-poke">SLOWKING · Won while staring at something else entirely</div>
+  </div>
+</div>
+
+<!-- ═══ ROUND 1 · BATTLE 03 ═══ -->
+<div class="section-div" data-r>
+  <span class="round-label">ROUND 1 · BATTLE 03</span>
+  <div class="round-title">Lapi vs. Rolex</div>
+</div>
+
+<div class="battle-card reveal" data-r style="--bar:var(--steel)">
+  <div class="hp-bars">
+    <div class="hp-side">
+      <div class="hp-trainer" style="color:var(--cyan)">LAPI</div>
+      <div class="hp-name">METAGROSS <span class="type-badge tb-steel">STEEL</span></div>
+      <div class="hp-bar-wrap"><div class="hp-bar-inner" style="--hp:100%;--hpc1:#06b6d4;--hpc2:#22d3ee"></div></div>
+      <div class="hp-val">HP: 100/100 (flawless)</div>
+    </div>
+    <div class="hp-side right">
+      <div class="hp-trainer" style="color:#fde68a">ROLEX</div>
+      <div class="hp-name">MEW <span class="type-badge tb-psychic">PSYCHIC</span></div>
+      <div class="hp-bar-wrap"><div class="hp-bar-inner" style="--hp:0%;--hpc1:#a855f7;--hpc2:#d946ef"></div></div>
+      <div class="hp-val">HP: 0/100 (fainted, but was fun)</div>
+    </div>
+  </div>
+  <div class="battle-field">
+    <div class="battle-art" style="border-right-color:rgba(6,182,212,.2)">
+      <svg viewBox="0 0 260 230" width="260" xmlns="http://www.w3.org/2000/svg">
+        <rect width="260" height="230" fill="#080c14"/>
+        <!-- METAGROSS — immovable, efficient, terrifying -->
+        <g>
+          <!-- main body: angular and heavy -->
+          <rect x="30" y="95" width="95" height="85" rx="8" fill="#4a5a70"/>
+          <rect x="38" y="103" width="79" height="69" rx="5" fill="#3a4a60"/>
+          <!-- X marking on face -->
+          <line x1="52" y1="115" x2="98" y2="145" stroke="#2060c0" stroke-width="3" opacity=".7"/>
+          <line x1="98" y1="115" x2="52" y2="145" stroke="#2060c0" stroke-width="3" opacity=".7"/>
+          <!-- eye -->
+          <ellipse cx="77" cy="130" rx="10" ry="8" fill="#e02020"/>
+          <ellipse cx="77" cy="130" rx="6" ry="5" fill="#ff3030"/>
+          <circle cx="77" cy="130" r="2" fill="white"/>
+          <!-- legs -->
+          <rect x="25" y="175" width="18" height="30" rx="4" fill="#4a5a70"/>
+          <rect x="55" y="175" width="18" height="30" rx="4" fill="#4a5a70"/>
+          <rect x="95" y="175" width="18" height="30" rx="4" fill="#4a5a70"/>
+          <rect x="125" y="175" width="18" height="30" rx="4" fill="#4a5a70"/>
+          <!-- steel aura -->
+          <ellipse cx="77" cy="140" rx="55" ry="65" fill="#4a5a70" opacity=".05"/>
+        </g>
+        <!-- MEW — absolutely having the time of its life, completely asleep now -->
+        <g style="animation:floatY 2s ease-in-out infinite">
+          <!-- body (fainted, floating upside down) -->
+          <ellipse cx="190" cy="138" rx="28" ry="25" fill="#f0a0d0" opacity=".5"/>
+          <!-- head upside down -->
+          <ellipse cx="190" cy="105" rx="22" ry="20" fill="#f0a0d0" opacity=".5"/>
+          <!-- swirly fainted eyes -->
+          <text x="182" y="110" font-size="10" fill="#6a4a6a" opacity=".7">@</text>
+          <text x="196" y="110" font-size="10" fill="#6a4a6a" opacity=".7">@</text>
+          <!-- tail curled up -->
+          <path d="M190 160 Q210 170 215 185 Q220 195 210 195 Q200 195 200 185" stroke="#f0a0d0" stroke-width="4" fill="none" opacity=".5" stroke-linecap="round"/>
+          <!-- stars (fainted) -->
+          <text x="155" y="82" font-size="12" fill="#fde68a" opacity=".4">★</text>
+          <text x="220" y="85" font-size="10" fill="#fde68a" opacity=".3">★</text>
+          <text x="175" y="72" font-size="8" fill="#fde68a" opacity=".35">★</text>
+          <!-- "zzz" -->
+          <text x="225" y="115" font-family="serif" font-size="14" fill="#a080c0" opacity=".4">z</text>
+          <text x="235" y="100" font-family="serif" font-size="10" fill="#a080c0" opacity=".3">z</text>
+        </g>
+        <text x="130" y="175" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="9" fill="white" opacity=".7">VS</text>
+        <ellipse cx="130" cy="205" rx="105" ry="14" fill="#1a2030" opacity=".5"/>
+      </svg>
+    </div>
+    <div class="commentary">
+      <div class="move-announce" style="--bar:var(--steel)">
+        <span class="move-name">METAGROSS used METEOR MASH!</span>
+        <span class="move-desc">Lapi says nothing. Metagross executes Meteor Mash with 4-frame-perfect timing on turn 1. Nobody is entirely sure when the battle started. <em>It is already over before Rolex's Mew finishes its entrance animation.</em></span>
+      </div>
+      <div class="move-announce" style="--bar:#fde68a">
+        <span class="move-name">MEW used TRANSFORM!</span>
+        <span class="move-desc">Rolex's Mew transforms into a copy of Metagross, laughs at this, transforms into a Magikarp, realizes this was suboptimal, transforms back, and is hit by Meteor Mash. <em>It was an excellent seventeen seconds of entertainment.</em></span>
+      </div>
+      <div class="line lapi"><span class="who">LAPI</span>"..."</div>
+      <div class="line rolex"><span class="who">ROLEX</span>"okay okay that was a bit fast. did you— was that a five-IV spread or a six?"</div>
+      <div class="line lapi"><span class="who">LAPI</span>"..."</div>
+      <div class="line rolex"><span class="who">ROLEX (already packing up)</span>"yeah I thought so. right. cheers. honestly though bro that Metagross is disgusting in the best way. nice."</div>
+      <div class="line ignite"><span class="who">IGNITE (from the stands)</span>"did lapi just one-shot a MEW??"</div>
+      <div class="line hydro"><span class="who">HYDROPHILIC</span>"Lapi does what Lapi does."</div>
+    </div>
+  </div>
+  <div class="winner-banner">
+    <div>
+      <div class="w-label">WINNER</div>
+      <div class="w-name">Lapi</div>
+    </div>
+    <div class="w-poke">METAGROSS · Exact turn 1. Lapi had a post-battle tea ready before the referee announced it.</div>
+  </div>
+</div>
+
+<!-- ═══ ROUND 1 · BATTLE 04 — Evran + Tista vs Bloodline + Burzum ═══ -->
+<div class="section-div" data-r>
+  <span class="round-label">ROUND 1 · DOUBLES BATTLE</span>
+  <div class="round-title">Evran & Tista vs. Bloodline23 & Burzum</div>
+</div>
+
+<div class="battle-card reveal" data-r style="--bar:var(--yellow)">
+  <div class="hp-bars">
+    <div class="hp-side">
+      <div class="hp-trainer" style="color:var(--yellow)">EVRAN + TISTA</div>
+      <div class="hp-name">BLAZIKEN + ESPEON <span class="type-badge tb-fire">FIRE</span><span class="type-badge tb-psychic">PSY</span></div>
+      <div class="hp-bar-wrap"><div class="hp-bar-inner" style="--hp:55%;--hpc1:#fbbf24;--hpc2:#f59e0b"></div></div>
+      <div class="hp-val">HP: combined 55%</div>
+    </div>
+    <div class="hp-side right">
+      <div class="hp-trainer" style="color:#ef4444">BLOOD23 + BURZUM</div>
+      <div class="hp-name">ENTEI + ABSOL <span class="type-badge tb-fire">FIRE</span><span class="type-badge tb-dark">DARK</span></div>
+      <div class="hp-bar-wrap"><div class="hp-bar-inner" style="--hp:0%;--hpc1:#ef4444;--hpc2:#dc2626"></div></div>
+      <div class="hp-val">HP: 0% · Burzum left mid-battle</div>
+    </div>
+  </div>
+  <div class="battle-field">
+    <div class="battle-art" style="border-right-color:rgba(251,191,36,.2);min-height:280px">
+      <svg viewBox="0 0 260 250" width="260" xmlns="http://www.w3.org/2000/svg">
+        <rect width="260" height="250" fill="#080c14"/>
+        <!-- BLAZIKEN -->
+        <g style="animation:floatY 1.5s ease-in-out infinite">
+          <ellipse cx="55" cy="158" rx="22" ry="25" fill="#c84010"/>
+          <ellipse cx="55" cy="120" rx="18" ry="20" fill="#c84010"/>
+          <!-- plume -->
+          <path d="M43 110 Q35 95 40 82 Q50 100 50 112 Q55 90 55 75 Q60 90 60 112 Q65 100 75 82 Q80 95 67 110" fill="#ff6020"/>
+          <ellipse cx="47" cy="117" rx="4" ry="4.5" fill="#2b1d0e"/>
+          <ellipse cx="63" cy="117" rx="4" ry="4.5" fill="#2b1d0e"/>
+          <!-- fighting stance -->
+          <path d="M36 145 Q25 135 18 125" stroke="#c84010" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <path d="M74 145 Q85 135 92 125" stroke="#c84010" stroke-width="7" stroke-linecap="round" fill="none"/>
+          <!-- fire kick charge -->
+          <path d="M55 180 Q40 195 30 205" stroke="#ff6020" stroke-width="5" stroke-linecap="round" fill="none"/>
+          <ellipse cx="55" cy="155" rx="28" ry="35" fill="#ff5e1a" opacity=".06"/>
+        </g>
+        <!-- ESPEON -->
+        <g style="animation:floatY 1.5s .4s ease-in-out infinite">
+          <ellipse cx="115" cy="170" rx="18" ry="16" fill="#c080d0"/>
+          <ellipse cx="115" cy="140" rx="16" ry="18" fill="#c080d0"/>
+          <!-- ears -->
+          <path d="M103 132 L100 115 L112 128" fill="#d090e0"/>
+          <path d="M127 132 L130 115 L118 128" fill="#d090e0"/>
+          <!-- gem -->
+          <ellipse cx="115" cy="138" rx="5" ry="4" fill="#ff80b0"/>
+          <!-- eyes closed in focus / calm -->
+          <path d="M107 142 Q111 139 115 142" stroke="#2b1d0e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <path d="M115 142 Q119 139 123 142" stroke="#2b1d0e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <!-- psychic rings -->
+          <ellipse cx="115" cy="155" rx="25" ry="30" fill="none" stroke="#c080d0" stroke-width="1" opacity=".3" style="animation:floatY 2s ease-in-out infinite"/>
+        </g>
+        <!-- ENTEI (fainted) -->
+        <g style="opacity:.4">
+          <ellipse cx="185" cy="162" rx="32" ry="25" fill="#c06020"/>
+          <ellipse cx="185" cy="128" rx="22" ry="20" fill="#c06020"/>
+          <!-- mane -->
+          <path d="M165 120 Q160 105 168 100 Q178 118 178 128" fill="#8a4010"/>
+          <path d="M205 120 Q210 105 202 100 Q192 118 192 128" fill="#8a4010"/>
+          <!-- fainted eyes -->
+          <text x="174" y="135" font-size="9" fill="#2b1d0e">×</text>
+          <text x="189" y="135" font-size="9" fill="#2b1d0e">×</text>
+          <text x="185" y="195" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="5" fill="#ef4444">FAINTED</text>
+        </g>
+        <!-- ABSOL (left mid-battle, empty space) -->
+        <text x="230" y="120" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="5" fill="#4a5568">ABSOL</text>
+        <text x="230" y="133" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="4" fill="#374151">LEFT.</text>
+        <!-- Evran's real pigeon on his shoulder (not a pokemon) -->
+        <text x="20" y="100" font-size="14" style="animation:floatY 2s ease-in-out infinite">🐦</text>
+        <text x="8" y="115" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="4" fill="#6a5a30">real pigeon</text>
+        <text x="8" y="124" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="4" fill="#6a5a30">not in game</text>
+        <ellipse cx="130" cy="220" rx="110" ry="14" fill="#1a2030" opacity=".5"/>
+      </svg>
+    </div>
+    <div class="commentary">
+      <div class="move-announce" style="--bar:var(--yellow)">
+        <span class="move-name">BLAZIKEN used BLAZE KICK!</span>
+        <span class="move-desc">Evran directs Blaziken with the calm precision of a kebab master at peak service. <em>"Fierce, like a proper marinade."</em> Blaziken does not question this. The kick is devastating.</span>
+      </div>
+      <div class="move-announce" style="--bar:#c080d0">
+        <span class="move-name">ESPEON used CALM MIND + PSYBEAM!</span>
+        <span class="move-desc">Tista's Espeon closes its eyes, breathes, and then fires a beam of psychic energy at Entei. Tista says nothing during this. He did not need to. <em>Entei faints. This is considered very Tista of them both.</em></span>
+      </div>
+      <div class="line blood"><span class="who">BLOODLINE23</span>"okay. solid team. respect."</div>
+      <div class="line evran"><span class="who">EVRAN</span>"The pigeon told me you would lead with Entei. It was in the pre-battle intelligence report."</div>
+      <div class="line blood"><span class="who">BLOODLINE23</span>"...your pigeon gave you a scouting report."</div>
+      <div class="line evran"><span class="who">EVRAN</span>"My pigeon gives me many things. I do not question the pigeon."</div>
+      <p style="font-size:.78rem;line-height:1.8;color:#4a5568;margin-top:.5rem"><em>Burzum's Absol had, by this point, departed the field. Nobody saw it leave. Bloodline23 checked his Pokéball. Empty. Burzum shrugged — a small, complete shrug — and that was that.</em></p>
+    </div>
+  </div>
+  <div class="winner-banner">
+    <div>
+      <div class="w-label">WINNERS</div>
+      <div class="w-name">Evran & Tista</div>
+    </div>
+    <div class="w-poke">BLAZIKEN + ESPEON · Pigeon intelligence confirmed decisive. Burzum's Absol left on its own terms.</div>
+  </div>
+</div>
+
+<!-- ═══ SEMIFINAL: VIOLENTINE ═══ -->
+<div class="section-div" data-r>
+  <span class="round-label">SEMIFINAL</span>
+  <div class="round-title">Violentine vs. Whisp</div>
+</div>
+
+<div class="battle-card reveal" data-r style="--bar:var(--dragon)">
+  <div class="hp-bars">
+    <div class="hp-side">
+      <div class="hp-trainer" style="color:var(--dragon)">VIOLENTINE</div>
+      <div class="hp-name">GARCHOMP <span class="type-badge tb-dragon">DRAGON</span></div>
+      <div class="hp-bar-wrap"><div class="hp-bar-inner" style="--hp:100%;--hpc1:#6366f1;--hpc2:#818cf8"></div></div>
+      <div class="hp-val">HP: 100/100 (untouched)</div>
+    </div>
+    <div class="hp-side right">
+      <div class="hp-trainer" style="color:var(--green)">WHISP</div>
+      <div class="hp-name">TOGEKISS <span class="type-badge tb-fairy">FAIRY</span></div>
+      <div class="hp-bar-wrap"><div class="hp-bar-inner" style="--hp:0%;--hpc1:#10b981;--hpc2:#34d399"></div></div>
+      <div class="hp-val">HP: 0/100</div>
+    </div>
+  </div>
+  <div class="battle-field">
+    <div class="battle-art" style="border-right-color:rgba(99,102,241,.2)">
+      <svg viewBox="0 0 260 230" width="260" xmlns="http://www.w3.org/2000/svg">
+        <rect width="260" height="230" fill="#080c14"/>
+        <!-- VIOLENTINE: standing beside his Garchomp, leaning against a nonexistent wall -->
+        <g>
+          <!-- Violentine character -->
+          <ellipse cx="50" cy="185" rx="14" ry="15" fill="#8080a0"/>
+          <path d="M38 173 Q41 160 50 158 Q59 160 62 173" fill="#202030"/>
+          <!-- lean — against nothing, but with commitment -->
+          <line x1="62" y1="178" x2="72" y2="200" stroke="#404060" stroke-width="3" stroke-linecap="round"/>
+          <!-- expression: nothing -->
+          <path d="M43 183 L57 183" stroke="#2b1d0e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <text x="50" y="212" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="4" fill="#9090d0">VIOLET</text>
+        </g>
+        <!-- GARCHOMP — did one thing and went back to standing there -->
+        <g>
+          <!-- body: formidable, sleek -->
+          <ellipse cx="110" cy="155" rx="32" ry="38" fill="#3a4a9a"/>
+          <!-- fin -->
+          <path d="M80 135 Q68 110 78 98 Q92 120 95 138" fill="#2a3a8a"/>
+          <!-- head with intimidating features -->
+          <ellipse cx="110" cy="108" rx="26" ry="28" fill="#3a4a9a"/>
+          <!-- horseshoe shape on face -->
+          <path d="M96 112 Q96 100 110 98 Q124 100 124 112" stroke="#e03020" stroke-width="2" fill="none"/>
+          <ellipse cx="100" cy="112" rx="5" ry="5.5" fill="#e03020"/>
+          <ellipse cx="120" cy="112" rx="5" ry="5.5" fill="#e03020"/>
+          <circle cx="101.5" cy="110" r="2" fill="white"/>
+          <circle cx="121.5" cy="110" r="2" fill="white"/>
+          <!-- DRAGON RUSH energy (aftermath) -->
+          <ellipse cx="110" cy="145" rx="40" ry="52" fill="#6366f1" opacity=".04"/>
+        </g>
+        <!-- TOGEKISS — defeated peacefully -->
+        <g style="opacity:.35">
+          <ellipse cx="198" cy="152" rx="30" ry="25" fill="white"/>
+          <!-- wings flopped -->
+          <path d="M172 145 Q158 130 165 118 Q176 138 180 148" fill="#e0e0e0"/>
+          <path d="M224 145 Q238 130 231 118 Q220 138 216 148" fill="#e0e0e0"/>
+          <ellipse cx="198" cy="128" rx="18" ry="20" fill="white"/>
+          <!-- kind fainted eyes -->
+          <path d="M188 132 Q193 129 198 132" stroke="#aaa" stroke-width="1.5" fill="none"/>
+          <path d="M198 132 Q203 129 208 132" stroke="#aaa" stroke-width="1.5" fill="none"/>
+          <text x="198" y="185" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="4.5" fill="#10b981">FAINTED</text>
+        </g>
+        <ellipse cx="130" cy="207" rx="105" ry="12" fill="#1a2030" opacity=".5"/>
+      </svg>
+    </div>
+    <div class="commentary">
+      <div class="move-announce" style="--bar:var(--dragon)">
+        <span class="move-name">GARCHOMP used DRAGON RUSH!</span>
+        <span class="move-desc">Violentine did not give an instruction. He was leaning. Garchomp performed Dragon Rush entirely of its own accord on turn 1. <em>Togekiss fainted.</em> Violentine remained leaning. He had not moved once during the battle.</span>
+      </div>
+      <div class="move-announce" style="--bar:var(--green)">
+        <span class="move-name">TOGEKISS used AIR SLASH · never happened</span>
+        <span class="move-desc">Whisp issued the command. Togekiss initiated the move animation. Dragon Rush arrived first. <em>There was no turn 2.</em></span>
+      </div>
+      <div class="line whisp"><span class="who">WHISP</span>"Did— did you tell it to do that?"</div>
+      <div class="line violet"><span class="who">VIOLENTINE</span>"..."</div>
+      <div class="line whisp"><span class="who">WHISP</span>"Okay. Okay. Fine. That was very good. I support this result."</div>
+      <div class="line violet"><span class="who">VIOLENTINE</span>"..."</div>
+      <div class="line ignite"><span class="who">IGNITE (from stands)</span>"HE DIDN'T EVEN LOOK UP FROM THE LEAN. HE DIDN'T LOOK UP FROM THE LEAN."</div>
+      <div class="line hydro"><span class="who">HYDROPHILIC</span>"Violentine is built different. I think we all knew this."</div>
+    </div>
+  </div>
+  <div class="winner-banner">
+    <div>
+      <div class="w-label">WINNER</div>
+      <div class="w-name">Violentine</div>
+    </div>
+    <div class="w-poke">GARCHOMP · Autonomous. Violentine never moved from his lean. This is the correct outcome.</div>
+  </div>
+</div>
+
+<!-- ═══ THE JOWISZ BRACKET ANOMALY ═══ -->
+<div class="section-div" data-r>
+  <span class="round-label">BRACKET ANOMALY</span>
+  <div class="round-title">The Jowisz Situation</div>
+</div>
+
+<div class="battle-card reveal" data-r style="--bar:var(--ghost)">
+  <div class="commentary" style="grid-column:1/-1;padding:1.5rem 2rem">
+    <div class="move-announce" style="--bar:var(--ghost)">
+      <span class="move-name">BRACKET UPDATE: JOWISZ · 4-0 RECORD</span>
+      <span class="move-desc">The tournament bracket was updated at this point to reflect that Jowisz had won four matches. Nobody had seen these matches occur. His opponent registration forms were signed but the signatures were unrecognizable. His Pokémon was listed as GENGAR. <em>Nobody had seen Gengar either.</em></span>
+    </div>
+    <div class="line jowisz"><span class="who">JOWISZ</span>"oh yeah I've been going for a while. I thought you all knew."</div>
+    <div class="line evran"><span class="who">EVRAN</span>"I knew."</div>
+    <div class="line ignite"><span class="who">IGNITE</span>"NOBODY TOLD ME THERE WERE ALREADY MATCHES HAPPENING."</div>
+    <div class="line jowisz"><span class="who">JOWISZ</span>"they were very good matches. you would have liked them."</div>
+    <div class="line ignite"><span class="who">IGNITE</span>"WHERE WERE YOU SITTING? I've been here the whole time."</div>
+    <div class="line jowisz"><span class="who">JOWISZ</span>"around."</div>
+    <p style="font-size:.78rem;line-height:1.8;color:#b0cbf9;margin-top:.5rem"><em>Jowisz was confirmed as a finalist. His Gengar was confirmed to exist. Both were accepted as facts without further investigation.</em></p>
+  </div>
+</div>
+
+<!-- ═══ THE SKY GOES DARK ═══ -->
+<div class="section-div" data-r>
+  <span class="round-label" style="color:var(--red);text-shadow:0 0 20px rgba(230,62,47,.5)">⚠ TOURNAMENT SUSPENDED ⚠</span>
+  <div class="round-title" style="color:var(--red)">A Wild MEWTWO Appeared.</div>
+</div>
+
+<div class="wide-battle reveal" data-r style="--bar:var(--red)">
+  <div class="wide-battle-art">
+    <svg viewBox="0 0 600 240" width="100%" xmlns="http://www.w3.org/2000/svg" style="max-width:600px">
+      <rect width="600" height="240" fill="#040608"/>
+      <!-- stadium lights out -->
+      <rect width="600" height="240" fill="#080010" opacity=".7"/>
+      <!-- purple ominous sky glow -->
+      <ellipse cx="300" cy="60" rx="250" ry="100" fill="#6d28d9" opacity=".15"/>
+      <ellipse cx="300" cy="60" rx="150" ry="60" fill="#7c3aed" opacity=".12"/>
+      <!-- MEWTWO descending — central, massive, dominant -->
+      <g style="animation:floatY 3s ease-in-out infinite">
+        <!-- cape/tail -->
+        <path d="M300 180 Q310 200 305 230" stroke="#9080c0" stroke-width="6" stroke-linecap="round" fill="none"/>
+        <!-- body -->
+        <ellipse cx="300" cy="130" rx="40" ry="50" fill="#b0a0d0"/>
+        <!-- chest sphere -->
+        <ellipse cx="300" cy="125" rx="15" ry="12" fill="#8070b0"/>
+        <!-- arms -->
+        <path d="M262 120 Q240 110 228 100" stroke="#b0a0d0" stroke-width="10" stroke-linecap="round" fill="none"/>
+        <path d="M338 120 Q360 110 372 100" stroke="#b0a0d0" stroke-width="10" stroke-linecap="round" fill="none"/>
+        <!-- hands with psychic energy -->
+        <ellipse cx="224" cy="98" rx="12" ry="12" fill="#8070b0"/>
+        <ellipse cx="376" cy="98" rx="12" ry="12" fill="#8070b0"/>
+        <ellipse cx="224" cy="98" rx="18" ry="18" fill="#9060f0" opacity=".2" style="animation:pulse 1.5s ease-in-out infinite"/>
+        <ellipse cx="376" cy="98" rx="18" ry="18" fill="#9060f0" opacity=".2" style="animation:pulse 1.5s ease-in-out .3s infinite"/>
+        <!-- head -->
+        <ellipse cx="300" cy="68" rx="36" ry="38" fill="#b0a0d0"/>
+        <!-- tubes on head -->
+        <rect x="286" y="40" width="8" height="20" rx="4" fill="#9080c0"/>
+        <rect x="306" y="40" width="8" height="20" rx="4" fill="#9080c0"/>
+        <!-- eyes — intense purple -->
+        <ellipse cx="288" cy="68" rx="8" ry="9" fill="#9040d0"/>
+        <ellipse cx="312" cy="68" rx="8" ry="9" fill="#9040d0"/>
+        <ellipse cx="288" cy="68" rx="5" ry="6" fill="#c060ff"/>
+        <ellipse cx="312" cy="68" rx="5" ry="6" fill="#c060ff"/>
+        <circle cx="288" cy="68" r="2" fill="white"/>
+        <circle cx="312" cy="68" r="2" fill="white"/>
+        <!-- psychic aura massive -->
+        <ellipse cx="300" cy="100" rx="100" ry="120" fill="#7c3aed" opacity=".07" style="animation:pulse 2s ease-in-out infinite"/>
+        <ellipse cx="300" cy="100" rx="70" ry="85" fill="#9060f0" opacity=".06" style="animation:pulse 2s ease-in-out .5s infinite"/>
+      </g>
+      <!-- lightning crackle around Mewtwo -->
+      <path d="M200 30 L210 55 L198 55 L215 80" stroke="#c060ff" stroke-width="1.5" fill="none" opacity=".5"/>
+      <path d="M400 25 L388 50 L400 50 L385 75" stroke="#c060ff" stroke-width="1.5" fill="none" opacity=".45"/>
+      <!-- ALL TRAINERS in the arena below - tiny crowd -->
+      <!-- left side: ignite, hydro, whisp -->
+      <ellipse cx="60"  cy="215" rx="10" ry="11" fill="#e8a060"/>
+      <ellipse cx="88"  cy="215" rx="10" ry="11" fill="#d0c0a0"/>
+      <ellipse cx="115" cy="215" rx="10" ry="11" fill="#d4b896"/>
+      <!-- right side: violentine, lapi, ana -->
+      <ellipse cx="480" cy="215" rx="10" ry="11" fill="#8080a0"/>
+      <ellipse cx="506" cy="215" rx="10" ry="11" fill="#c0d0b0"/>
+      <ellipse cx="530" cy="215" rx="10" ry="11" fill="#d0a0c0"/>
+      <!-- center: evran+tista, anduin, SW -->
+      <ellipse cx="148" cy="215" rx="10" ry="11" fill="#c8a060"/>
+      <ellipse cx="168" cy="215" rx="10" ry="11" fill="#c0a090"/>
+      <ellipse cx="200" cy="215" rx="10" ry="11" fill="#b8a880"/>
+      <!-- SW with golden mustache gleam -->
+      <ellipse cx="300" cy="215" rx="14" ry="14" fill="#e0c090"/>
+      <ellipse cx="300" cy="211" rx="12" ry="3" fill="#c8902a" opacity=".8"/>
+      <!-- burzum appearing at edge -->
+      <ellipse cx="555" cy="215" rx="9" ry="10" fill="#b0b0b0" opacity=".6"/>
+      <!-- rolex appeared from nowhere -->
+      <ellipse cx="450" cy="215" rx="10" ry="11" fill="#c0a840"/>
+      <!-- tiny jowisz visible for once -->
+      <ellipse cx="380" cy="215" rx="10" ry="11" fill="#a0a880"/>
+      <!-- giant HP bar for Mewtwo -->
+      <rect x="80" y="10" width="440" height="20" rx="4" fill="#1a0a2a" stroke="#7c3aed" stroke-width="1"/>
+      <rect x="82" y="12" width="434" height="16" rx="3" fill="#7c3aed" opacity=".5"/>
+      <rect x="82" y="12" width="434" height="16" rx="3">
+        <animate attributeName="width" from="434" to="320" dur="3s" repeatCount="indefinite" begin="2s"/>
+      </rect>
+      <text x="300" y="24" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="6" fill="white">MEWTWO · HP ████████████░░░░░░░</text>
+    </svg>
+  </div>
+  <div class="wide-battle-prose">
+    <div>
+      <p>The sky above the Grand Arena went dark without warning. Then a light — purple, cold, ancient — descended from above. The stands went silent. Every Pokéball in every trainer's belt rattled simultaneously.</p>
+      <p><em>MEWTWO</em> descended from the clouds with the slow, deliberate gravity of something that had decided to be here and did not require permission. It had been drawn by the power of the tournament. It had a challenge. It was not looking for a single champion.</p>
+      <p>It was looking for <strong>everyone</strong>.</p>
+      <div class="line ignite"><span class="who">IGNITE</span>"okay so. so this is happening."</div>
+      <div class="line hydro"><span class="who">HYDROPHILIC</span>"I want everyone to know that I am very hydrated right now and I think we're going to be okay."</div>
+      <div class="line ignite"><span class="who">IGNITE</span>"hydro I love you and also this is not the moment—"</div>
+      <div class="line hydro"><span class="who">HYDROPHILIC</span>"It is always the moment for hydration."</div>
+      <div class="line evran"><span class="who">EVRAN</span>"I anticipated this."</div>
+      <div class="line ignite"><span class="who">IGNITE</span>"EVRAN DID YOU BOOK A MEWTWO FOR THE TOURNAMENT??"</div>
+      <div class="line evran"><span class="who">EVRAN</span>"I did not book the Mewtwo. I simply... did not exclude the possibility. These are different things."</div>
+    </div>
+    <div>
+      <p>SuperWyndfal stepped forward first, Alakazam beside him — its magnificent silver mustache gleaming in the purple light of Mewtwo's aura. It was, the crowd agreed quietly, the correct mustache for the moment.</p>
+      <p>Then everyone else stepped up. All at once. Even those who had lost their earlier rounds. Even those who had half their team fainted. Even Anduin, who was technically trying to befriend Mewtwo at the same time he was challenging it.</p>
+      <p>And from the shadows at the very edge of the arena, a figure appeared that nobody had noticed arrive: <em>Burzum</em>. He had not been at the earlier finals. He had not been visible in the stands. But he was here now, Absol at his side, because something needed him. That was always when Burzum appeared.</p>
+      <div class="line burz"><span class="who">BURZUM</span>"..."</div>
+      <div class="line burz"><span class="who">BURZUM</span>"...I'm in."</div>
+      <p>That was all he needed to say.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ THE RAID BATTLE ═══ -->
+<div class="section-div" data-r>
+  <span class="round-label" style="color:#c060ff;text-shadow:0 0 20px rgba(192,96,255,.5)">RAID BATTLE · ALL TRAINERS</span>
+  <div class="round-title" style="background:linear-gradient(90deg,var(--red),#c060ff,var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent">Everyone vs. Mewtwo</div>
+</div>
+
+<div class="wide-battle reveal" data-r style="--bar:#c060ff">
+  <div class="wide-battle-art">
+    <svg viewBox="0 0 600 255" width="100%" xmlns="http://www.w3.org/2000/svg" style="max-width:600px">
+      <rect width="600" height="255" fill="#040608"/>
+      <ellipse cx="300" cy="80" rx="260" ry="110" fill="#7c3aed" opacity=".1"/>
+      <!-- MEWTWO center -- taking hits but still immense -->
+      <g style="animation:floatY 3s ease-in-out infinite">
+        <path d="M300 185 Q308 200 304 225" stroke="#9080c0" stroke-width="5" stroke-linecap="round" fill="none"/>
+        <ellipse cx="300" cy="130" rx="38" ry="48" fill="#9888c0"/>
+        <ellipse cx="300" cy="125" rx="14" ry="11" fill="#7060a0"/>
+        <path d="M264 118 Q242 108 230 98" stroke="#9888c0" stroke-width="9" stroke-linecap="round" fill="none"/>
+        <path d="M336 118 Q358 108 370 98" stroke="#9888c0" stroke-width="9" stroke-linecap="round" fill="none"/>
+        <ellipse cx="225" cy="96" rx="11" ry="11" fill="#7060a0"/>
+        <ellipse cx="375" cy="96" rx="11" ry="11" fill="#7060a0"/>
+        <ellipse cx="300" cy="68" rx="34" ry="36" fill="#9888c0"/>
+        <rect x="288" y="42" width="7" height="18" rx="3.5" fill="#8070b0"/>
+        <rect x="305" y="42" width="7" height="18" rx="3.5" fill="#8070b0"/>
+        <!-- SLIGHTLY damaged — one eye has a flicker, aura weakened -->
+        <ellipse cx="288" cy="67" rx="7" ry="8" fill="#7030b0"/>
+        <ellipse cx="312" cy="67" rx="7" ry="8" fill="#7030b0"/>
+        <ellipse cx="288" cy="67" rx="4" ry="5" fill="#b050f0" style="animation:pulse 1s ease-in-out infinite"/>
+        <ellipse cx="312" cy="67" rx="4" ry="5" fill="#b050f0" style="animation:pulse 1s ease-in-out .2s infinite"/>
+        <!-- BATTLE DAMAGE marks -->
+        <path d="M285 120 Q295 115 305 120" stroke="#e0d0ff" stroke-width="2" fill="none" opacity=".3"/>
+        <text x="268" y="90" font-size="8" fill="#fbbf24" opacity=".4">★</text>
+        <!-- psychic aura, reduced -->
+        <ellipse cx="300" cy="105" rx="80" ry="100" fill="#7c3aed" opacity=".05" style="animation:pulse 2s ease-in-out infinite"/>
+      </g>
+      <!-- Mewtwo HP bar critically low -->
+      <rect x="150" y="8" width="300" height="16" rx="3" fill="#1a0a2a" stroke="#7c3aed" stroke-width="1"/>
+      <rect x="152" y="10" width="58" height="12" rx="2" fill="#ef4444" opacity=".8"/>
+      <text x="300" y="21" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="5.5" fill="white">MEWTWO HP: ██░░░░░░░░░░░░░░░░░░</text>
+
+      <!-- ALL POKEMON lined up below -->
+      <!-- CHARIZARD (Ignite) - breathing fire from the left -->
+      <g style="animation:floatY 1.5s 0s ease-in-out infinite">
+        <ellipse cx="35" cy="218" rx="18" ry="20" fill="#e07030"/>
+        <path d="M17 208 Q8 195 14 185 Q22 200 24 210" fill="#c85820" opacity=".7"/>
+        <path d="M35 235 Q38 242 35 248" stroke="#e07030" stroke-width="4" stroke-linecap="round" fill="none"/>
+        <path d="M31 246 Q35 238 39 248 Q37 241 35 244 Q33 241 31 246Z" fill="#ff6030" style="animation:floatY .6s ease-in-out infinite;transform-origin:35px 246px"/>
+        <!-- fire blast toward Mewtwo -->
+        <path d="M50 208 Q110 175 200 150" stroke="#ff5e1a" stroke-width="3" fill="none" opacity=".4" style="animation:zap 2s ease-in-out infinite"/>
+      </g>
+      <!-- BLASTOISE (Hydro) - water cannon -->
+      <g style="animation:floatY 1.5s .2s ease-in-out infinite">
+        <ellipse cx="85" cy="222" rx="17" ry="18" fill="#2a3a8a"/>
+        <rect x="70" y="205" width="8" height="18" rx="4" fill="#2a2a5a" transform="rotate(-25,74,214)"/>
+        <!-- water jet -->
+        <path d="M68 200 Q115 170 210 145" stroke="#0ea5e9" stroke-width="3" fill="none" opacity=".5" style="animation:zap 2s ease-in-out .3s infinite"/>
+      </g>
+      <!-- SLOWKING (Ana) - staring directly at Mewtwo (rare) -->
+      <g style="animation:floatY 1.5s .4s ease-in-out infinite">
+        <ellipse cx="132" cy="218" rx="15" ry="18" fill="#d080b0"/>
+        <path d="M122 202 L125 194 L128 202 L132 191 L136 202 L139 194 L142 202Z" fill="#c85020"/>
+        <!-- ACTUALLY looking at Mewtwo this time — first time all tournament -->
+        <ellipse cx="125" cy="213" rx="5" ry="5.5" fill="#2b1d0e"/>
+        <ellipse cx="139" cy="213" rx="5" ry="5.5" fill="#2b1d0e"/>
+        <circle cx="127" cy="211" r="2" fill="white" style="animation:pulse 1.5s ease-in-out infinite"/>
+        <circle cx="141" cy="211" r="2" fill="white" style="animation:pulse 1.5s ease-in-out .2s infinite"/>
+        <text x="132" y="245" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="3.5" fill="#d946ef">MAKING EYE CONTACT</text>
+      </g>
+      <!-- BLAZIKEN + ESPEON (Evran + Tista) -->
+      <g style="animation:floatY 1.5s .5s ease-in-out infinite">
+        <ellipse cx="178" cy="220" rx="15" ry="17" fill="#c84010"/>
+        <path d="M166 210 Q158 198 164 188 Q172 202 174 212" fill="#ff6020" opacity=".7"/>
+        <!-- fire kick aimed up -->
+        <path d="M178 235 Q168 248 162 248" stroke="#ff6020" stroke-width="4" stroke-linecap="round" fill="none" style="animation:floatY .8s ease-in-out infinite"/>
+      </g>
+      <g style="animation:floatY 1.5s .6s ease-in-out infinite">
+        <ellipse cx="212" cy="222" rx="13" ry="15" fill="#c080d0"/>
+        <ellipse cx="212" cy="215" rx="7" ry="6" fill="#ff80b0"/>
+        <!-- psychic beam -->
+        <path d="M220 212 Q260 185 295 160" stroke="#d946ef" stroke-width="2" fill="none" opacity=".5" style="animation:zap 1.8s ease-in-out infinite"/>
+      </g>
+      <!-- METAGROSS (Lapi) — silent efficient -->
+      <g>
+        <rect x="240" y="210" width="48" height="40" rx="5" fill="#4a5a70"/>
+        <rect x="248" y="218" width="32" height="24" rx="3" fill="#3a4a60"/>
+        <line x1="254" y1="224" x2="274" y2="238" stroke="#2060c0" stroke-width="2" opacity=".6"/>
+        <line x1="274" y1="224" x2="254" y2="238" stroke="#2060c0" stroke-width="2" opacity=".6"/>
+        <ellipse cx="264" cy="230" rx="7" ry="5" fill="#e02020"/>
+        <!-- meteor mash beam -->
+        <path d="M264 210 Q280 185 297 158" stroke="#06b6d4" stroke-width="3" fill="none" opacity=".6" style="animation:zap 1.5s ease-in-out infinite"/>
+      </g>
+      <!-- GARCHOMP (Violentine) - Dragon Rush hit marks on Mewtwo -->
+      <g style="animation:floatY 1.5s .7s ease-in-out infinite">
+        <ellipse cx="315" cy="222" rx="16" ry="20" fill="#3a4a9a"/>
+        <path d="M300 213 Q290 200 294 190 Q305 205 308 215" fill="#2a3a8a" opacity=".7"/>
+        <ellipse cx="310" cy="212" rx="5" ry="5.5" fill="#e03020"/>
+        <ellipse cx="326" cy="212" rx="5" ry="5.5" fill="#e03020"/>
+        <path d="M315 238 Q305 248 300 252" stroke="#3a4a9a" stroke-width="5" stroke-linecap="round" fill="none"/>
+      </g>
+      <!-- DRAGONITE (Anduin) - friendly + attacking -->
+      <g style="animation:floatY 1.5s .8s ease-in-out infinite">
+        <ellipse cx="358" cy="218" rx="16" ry="19" fill="#e8a020"/>
+        <path d="M344 210 Q333 195 338 183 Q348 200 350 212" fill="#c87810" opacity=".7"/>
+        <path d="M372 210 Q381 195 376 183 Q366 200 364 212" fill="#c87810" opacity=".7"/>
+        <!-- waving at Mewtwo AND using thunder -->
+        <path d="M370 208 Q385 190 392 180" stroke="#e8a020" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <path d="M370 205 Q410 175 300 155" stroke="#fbbf24" stroke-width="1.5" fill="none" opacity=".35" style="animation:zap 2s ease-in-out .5s infinite"/>
+      </g>
+      <!-- GENGAR (Jowisz) - inside Mewtwo's shadow somehow -->
+      <text x="298" y="135" text-anchor="middle" font-size="10" fill="#4ade80" opacity=".6" style="animation:pulse 1.5s ease-in-out infinite">👻</text>
+      <text x="300" y="145" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="3.5" fill="#4ade80" opacity=".5">GENGAR</text>
+      <text x="300" y="152" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="3" fill="#4ade80" opacity=".4">(inside shadow??)</text>
+      <!-- ABSOL (Burzum) - predicting every move -->
+      <g style="animation:floatY 1.5s .9s ease-in-out infinite">
+        <ellipse cx="465" cy="222" rx="15" ry="17" fill="#f0f0f0"/>
+        <!-- absol blade horn -->
+        <path d="M456 208 Q460 195 470 205" fill="#e0e0e0"/>
+        <ellipse cx="458" cy="218" rx="5" ry="5.5" fill="#2b1d0e"/>
+        <ellipse cx="472" cy="218" rx="5" ry="5.5" fill="#2b1d0e"/>
+        <!-- predict aura -->
+        <ellipse cx="465" cy="210" rx="22" ry="26" fill="white" opacity=".04" style="animation:pulse 1s ease-in-out infinite"/>
+      </g>
+      <!-- MEW (Rolex) - appeared from nowhere -->
+      <g style="animation:floatY 2s 1s ease-in-out infinite">
+        <ellipse cx="512" cy="215" rx="18" ry="16" fill="#f0a0d0" opacity=".9"/>
+        <ellipse cx="512" cy="195" rx="14" ry="16" fill="#f0a0d0" opacity=".9"/>
+        <!-- tail -->
+        <path d="M512 230 Q530 240 535 255 Q540 265 530 265 Q520 265 520 255" stroke="#f0a0d0" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <ellipse cx="503" cy="192" rx="4" ry="4.5" fill="#2b1d0e"/>
+        <ellipse cx="521" cy="192" rx="4" ry="4.5" fill="#2b1d0e"/>
+        <text x="512" y="250" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="3.5" fill="#f0a0d0">MEW</text>
+        <text x="512" y="257" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="3" fill="#c080a0">ROLEX HAD THIS??</text>
+        <!-- mew beam toward Mewtwo -->
+        <path d="M502 188 Q420 165 305 150" stroke="#f0a0d0" stroke-width="2" fill="none" opacity=".4" style="animation:zap 2s ease-in-out .8s infinite"/>
+      </g>
+      <!-- EVRAN'S REAL PIGEON - floating toward Mewtwo -->
+      <text x="555" y="195" font-size="18" style="animation:floatY 2s ease-in-out infinite">🐦</text>
+      <path d="M555" fill="none"/>
+      <path d="M553 190 Q500 170 400 150 Q350 138 304 128" stroke="#c8902a" stroke-width="1" fill="none" opacity=".2" stroke-dasharray="4 4"/>
+      <text x="555" y="215" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="3.5" fill="#c8902a">real pigeon</text>
+      <!-- SuperWyndfal + Alakazam centerpiece -->
+      <g style="animation:floatY 1.5s .3s ease-in-out infinite">
+        <ellipse cx="395" cy="220" rx="14" ry="16" fill="#e0c090"/>
+        <path d="M382 208 Q386 192 395 189 Q404 192 408 208" fill="#3a2010"/>
+        <ellipse cx="388" cy="216" rx="3" ry="3.5" fill="#2b1d0e"/>
+        <ellipse cx="402" cy="216" rx="3" ry="3.5" fill="#2b1d0e"/>
+        <!-- super wyndfal's tiny glowing mustache -->
+        <path d="M383 221 Q388 218 392 219 Q395 220 395 219 Q395 218 398 217 Q403 217 407 221 Q403 225 398 223 Q395 224 395 223 Q395 222 392 224 Q387 225 383 221Z" fill="#c8902a" opacity=".9" style="animation:glow 2s ease-in-out infinite;--gcolor:#c8902a"/>
+        <text x="395" y="248" text-anchor="middle" font-family="'Press Start 2P',monospace" font-size="3.5" fill="#c4a35a">SW</text>
+      </g>
+    </svg>
+  </div>
+  <div class="wide-battle-prose">
+    <div>
+      <p>Every Pokémon entered the field at once. The arena shook. Mewtwo's psychic aura expanded and then— paused, as if calculating. Twelve trainers. Twelve Pokémon. <em>One very confused legendary.</em></p>
+      <p><strong>Charizard and Blastoise</strong> attacked simultaneously — fire and water, Ignite and Hydrophilic side by side for the first time in a battle. The collision produced a roiling column of superheated steam that hit Mewtwo square in the chest.</p>
+      <div class="line ignite"><span class="who">IGNITE</span>"bro did we just— did WE just do a combined move??"</div>
+      <div class="line hydro"><span class="who">HYDROPHILIC</span>"I wasn't going to say anything but YES. I think that was a Steam Cannon."</div>
+      <div class="line ignite"><span class="who">IGNITE</span>"we invented a move. WE INVENTED A MOVE."</div>
+      <p><strong>Ana's Slowking</strong> made eye contact with Mewtwo — the first direct eye contact it had made with anything all tournament. Mewtwo stared back. Something psychic passed between them. Neither blinked for eleven seconds. The stadium was completely silent.</p>
+      <div class="line ana"><span class="who">ANA (quietly, to Mewtwo)</span>"you have very interesting pupils."</div>
+      <p>Mewtwo did not know how to process this. Slowking returned to looking at the pillar. It was processing something, clearly. It fired Psyshock three seconds later and Mewtwo staggered.</p>
+      <p><strong>Jowisz's Gengar</strong> was found, somehow, inside Mewtwo's own shadow. It had apparently been there since Mewtwo arrived. How this was possible was a question for another time. Shadow Ball from inside the target's shadow was, geometrically, devastating.</p>
+      <div class="line jowisz"><span class="who">JOWISZ</span>"Gengar likes shadows. This one was very comfortable."</div>
+    </div>
+    <div>
+      <p><strong>Burzum's Absol</strong> predicted every single one of Mewtwo's counterattacks. Not some of them. Every one. Each time Mewtwo moved, Absol was already positioned to redirect the hit. The other trainers began unconsciously following Absol's movements without realizing it. They were all, without knowing it, coordinated.</p>
+      <p><strong>Lapi</strong> opened a sealed envelope from his inside pocket. It was labeled "MEWTWO CONTINGENCY (do not open unless Mewtwo arrives)." Inside: a twelve-point coordinated raid strategy, fully annotated. He had prepared this before the tournament began. He had told nobody.</p>
+      <div class="line lapi"><span class="who">LAPI (handing pages to everyone)</span>"page three is yours, page seven is yours—"</div>
+      <div class="line evran"><span class="who">EVRAN</span>"I saw this envelope in his bag last week."</div>
+      <div class="line ignite"><span class="who">IGNITE</span>"AND YOU DIDN'T SAY ANYTHING??"</div>
+      <div class="line evran"><span class="who">EVRAN</span>"I assumed it was handled. It was handled."</div>
+      <p>Then, in the hush after the final coordinated strike brought Mewtwo's aura to its lowest point — <strong>Evran's pigeon</strong> flew from his shoulder and crossed the field. The real pigeon. The non-Pokémon pigeon. It crossed 200 meters of psychic-charged air without difficulty, landed on Mewtwo's shoulder, and cooed once.</p>
+      <p>Mewtwo looked at it for a very long time.</p>
+      <p>Then Mewtwo left. Slowly, without a word, it rose back into the sky. The purple glow faded. The arena lights returned. Somewhere in the rafters, the scoreboard tried to display a winner and simply showed "????".</p>
+      <div class="line evran"><span class="who">EVRAN</span>"The pigeons always know."</div>
+      <div class="line ignite"><span class="who">IGNITE</span>"...I'm not even going to ask."</div>
+      <div class="line evran"><span class="who">EVRAN</span>"Good."</div>
+    </div>
+  </div>
+  <div class="winner-banner draw">
+    <div>
+      <div class="w-label" style="color:var(--blue)">RAID RESULT</div>
+      <div class="w-name">Everyone + One Pigeon</div>
+    </div>
+    <div class="w-poke">MEWTWO retreated after pigeon contact. Scoreboard shows "????". Tournament officially concluded.</div>
+  </div>
+</div>
+
+</div>
+
+<!-- ══════════ EPILOGUE ══════════ -->
+<div class="epilogue" data-r>
+  <div class="epi-pixel">
+    ★ TOURNAMENT RESULTS ★<br><br>
+    BATTLE 01: HYDROPHILIC wins<br>
+    BATTLE 02: ANA wins<br>
+    BATTLE 03: LAPI wins<br>
+    BATTLE 04: EVRAN+TISTA win<br>
+    SEMI: VIOLENTINE wins (one move)<br>
+    FINALS: NEVER HAPPENED<br>
+    MEWTWO: LEFT (pigeon)<br><br>
+    CHAMPION: undefined
+  </div>
+  <div class="epi-body">
+    The Grand Mustachestan Pokémon Championship concluded without a declared champion, which Evran privately considered the most philosophically correct outcome.<br><br>
+    <em>Ignite</em> demanded a rematch against Hydrophilic. Hydrophilic brought Blastoise a fresh bottle of water. Charizard accepted a drink from it, which Ignite publicly denied and privately did not stop.<br><br>
+    <strong>Ana</strong> was awarded the Most Valuable Trainer trophy for her Slowking's performance. She was not present for the ceremony. She was staring at the trophy case. She noted, correctly, that the trophy case had structural issues.<br><br>
+    <em>Lapi</em>'s Metagross was voted most intimidating Pokémon in the arena. Lapi was not there to receive this recognition. The plaque was left on his desk. It had a small note beside it that said "thank you" in handwriting nobody recognized.<br><br>
+    <strong>Violentine</strong> was contacted by three professional leagues. He did not reply. He was, presumably, leaning against something.<br><br>
+    <em>Rolex's Mew</em> remains the most searched topic in Mustachestan's online spaces. Where did he get a Mew? He has not said. He's disappeared again. The countdown subreddit has adapted.<br><br>
+    <strong>Burzum's Absol</strong> was the only Pokémon to go 5-for-5 on Mewtwo prediction. Burzum left after the battle without being photographed. This was expected. This was correct.<br><br>
+    And Evran's pigeon — the real one, the non-Pokémon, the bird that has accompanied him through tournament battles and kebab consultations and pigeon court trials — received, by unanimous vote of the arena, an honorary Pokéball that it immediately escaped from and sat on top of.<br><br>
+    <em>The Pokéball remained on the ground.</em><br>
+    <em>The pigeon remained on top of it.</em><br>
+    <em>This was considered appropriate.</em>
+  </div>
+  <div style="margin-top:2rem;font-family:'Press Start 2P',monospace;font-size:.5rem;color:green;letter-spacing:2px">
+    PRESS START TO PLAY AGAIN · SEASON 2 PENDING · MEWTWO WHEREABOUTS UNKNOWN
+  </div>
+</div>
+
+<script>
+// Stars
+const sf = document.getElementById('stars');
+for(let i=0;i<60;i++){
+  const s=document.createElement('div');
+  s.className='star-dot';
+  const sz=Math.random()*2+.5;
+  s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*3+2).toFixed(1)}s;--dl:${(Math.random()*4).toFixed(1)}s`;
+  sf.appendChild(s);
+}
+// Reveal
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('vis');});},{threshold:.1});
+document.querySelectorAll('[data-r],.reveal,.section-div,.epilogue').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
