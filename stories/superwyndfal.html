@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SuperWyndfal & The Glorious Mustache</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #c8922a;
+    --gold-light: #f0c060;
+    --deep: #1a0e2e;
+    --ink: #2b1d0e;
+    --cream: #fdf4e3;
+    --rust: #8b3a1e;
+    --sky: #3b6fa0;
+    --cape: #5c1a2e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--deep);
+    font-family: 'Lora', serif;
+    color: var(--ink);
+    overflow-x: hidden;
+  }
+
+  /* ── TITLE PAGE ── */
+  .title-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at 50% 30%, #2e1a4a 0%, var(--deep) 70%);
+    position: relative;
+    overflow: hidden;
+    padding: 2rem;
+  }
+
+  .stars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .star {
+    position: absolute;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle var(--d, 3s) ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%,100%{opacity:.2;transform:scale(1)}
+    50%{opacity:1;transform:scale(1.4)}
+  }
+
+  .hero-figure {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin-bottom: 1.5rem;
+    animation: float 4s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-18px)}
+  }
+
+  /* SVG hero */
+  .hero-svg { width: 100%; height: 100%; }
+
+  .title-text {
+    font-family: 'Playfair Display', serif;
+    font-weight: 900;
+    font-size: clamp(2rem, 7vw, 3.8rem);
+    color: var(--gold-light);
+    text-align: center;
+    text-shadow: 0 0 40px rgba(200,146,42,0.6), 2px 3px 0 var(--rust);
+    line-height: 1.1;
+    letter-spacing: -.5px;
+  }
+  .subtitle-text {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1rem, 3vw, 1.4rem);
+    color: var(--gold);
+    margin-top: .6rem;
+    text-align: center;
+    opacity: .85;
+  }
+  .scroll-hint {
+    margin-top: 2.5rem;
+    color: rgba(255,255,255,.4);
+    font-size: .85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:.3}50%{opacity:.8}}
+
+  /* ── PAGES ── */
+  .pages { max-width: 860px; margin: 0 auto; }
+
+  .page {
+    background: var(--cream);
+    margin: 3rem 1rem;
+    border-radius: 4px;
+    box-shadow: 0 8px 60px rgba(0,0,0,.55), inset 0 0 0 1px rgba(200,146,42,.25);
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity .7s ease, transform .7s ease;
+    position: relative;
+  }
+  .page.visible { opacity: 1; transform: translateY(0); }
+
+  .page-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 360px;
+  }
+  .page-inner.reverse { direction: rtl; }
+  .page-inner.reverse > * { direction: ltr; }
+
+  .page-art {
+    background: var(--deep);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    min-height: 300px;
+  }
+
+  .page-text {
+    padding: 2.5rem 2.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .chapter {
+    font-size: .7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: .6rem;
+    font-family: 'Playfair Display', serif;
+  }
+
+  .page-title {
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    font-size: clamp(1.2rem, 3vw, 1.7rem);
+    color: var(--ink);
+    margin-bottom: 1rem;
+    line-height: 1.2;
+  }
+
+  .page-body {
+    font-size: .97rem;
+    line-height: 1.8;
+    color: #3a2a18;
+  }
+
+  .page-number {
+    position: absolute;
+    bottom: 1rem;
+    right: 1.5rem;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: .8rem;
+    color: var(--gold);
+    opacity: .7;
+  }
+
+  .ornament {
+    text-align: center;
+    color: var(--gold);
+    font-size: 1.4rem;
+    margin: .5rem 0;
+    opacity: .6;
+  }
+
+  /* ── SCENE ILLUSTRATIONS (pure CSS/SVG) ── */
+
+  .art-bg {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 60% 40%, #2a1a4a, #0d0820);
+  }
+
+  /* glowing mustache animation */
+  @keyframes glowStache {
+    0%,100%{filter:drop-shadow(0 0 6px #f0c060)}
+    50%{filter:drop-shadow(0 0 18px #f0c060) drop-shadow(0 0 30px #c8922a)}
+  }
+  @keyframes sadBounce {
+    0%,100%{transform:translateY(0) rotate(-2deg)}
+    50%{transform:translateY(6px) rotate(2deg)}
+  }
+  @keyframes windBlow {
+    0%{transform:translateX(0) rotate(0deg) scale(1)}
+    30%{transform:translateX(40px) rotate(15deg) scale(.9)}
+    60%{transform:translateX(110px) rotate(35deg) scale(.8)}
+    100%{transform:translateX(200px) rotate(60deg) scale(.7) translateY(-30px);opacity:0}
+  }
+  @keyframes searchLight {
+    0%,100%{transform:rotate(-20deg)}
+    50%{transform:rotate(20deg)}
+  }
+  @keyframes reunion {
+    0%{transform:translateX(-60px);opacity:0}
+    60%{transform:translateX(5px);opacity:1}
+    80%{transform:translateX(-3px)}
+    100%{transform:translateX(0)}
+  }
+  @keyframes heartPop {
+    0%{transform:scale(0) translateY(0);opacity:0}
+    50%{transform:scale(1.3) translateY(-10px);opacity:1}
+    100%{transform:scale(1) translateY(-20px);opacity:.9}
+  }
+  @keyframes shimmer {
+    0%{stroke-dashoffset:200}
+    100%{stroke-dashoffset:0}
+  }
+  @keyframes rainDrop {
+    0%{transform:translateY(-20px);opacity:0}
+    20%{opacity:.7}
+    100%{transform:translateY(80px);opacity:0}
+  }
+  @keyframes cape {
+    0%,100%{transform:rotate(-3deg) skewX(-2deg)}
+    50%{transform:rotate(3deg) skewX(2deg)}
+  }
+
+  .mustache-glow { animation: glowStache 2s ease-in-out infinite; }
+
+  @media(max-width:600px){
+    .page-inner { grid-template-columns: 1fr; }
+    .page-inner.reverse { direction: ltr; }
+    .page-art { min-height: 220px; }
+  }
+
+  /* final page */
+  .final-page {
+    background: radial-gradient(ellipse at 50% 40%, #2e1a4a, #0d0820);
+    margin: 3rem 1rem 5rem;
+    border-radius: 4px;
+    box-shadow: 0 8px 60px rgba(0,0,0,.55);
+    padding: 4rem 2rem;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity .7s ease, transform .7s ease;
+  }
+  .final-page.visible { opacity:1; transform:translateY(0); }
+  .final-quote {
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    font-size: clamp(1.3rem, 4vw, 2rem);
+    color: var(--gold-light);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.5;
+    text-shadow: 0 0 30px rgba(200,146,42,.4);
+  }
+  .final-author {
+    margin-top: 1.5rem;
+    color: var(--gold);
+    opacity: .6;
+    font-size: .85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════ TITLE PAGE ════════════════ -->
+<div class="title-page">
+  <div class="stars" id="stars"></div>
+
+  <div class="hero-figure">
+    <svg class="hero-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+      <!-- cape -->
+      <path d="M60 130 Q55 180 40 200 Q110 185 170 200 Q155 180 150 130" fill="#5c1a2e" style="animation:cape 2.5s ease-in-out infinite;transform-origin:110px 150px"/>
+      <!-- body -->
+      <rect x="72" y="125" width="76" height="70" rx="12" fill="#2563a8"/>
+      <!-- S emblem -->
+      <circle cx="110" cy="155" r="18" fill="#c8922a" opacity=".9"/>
+      <text x="110" y="162" text-anchor="middle" font-family="serif" font-weight="900" font-size="22" fill="#1a0e2e">S</text>
+      <!-- head -->
+      <ellipse cx="110" cy="98" rx="38" ry="40" fill="#e8c99a"/>
+      <!-- hair -->
+      <path d="M75 82 Q80 55 110 52 Q140 55 145 82" fill="#3a2010"/>
+      <!-- eyes -->
+      <ellipse cx="97" cy="95" rx="5" ry="6" fill="#2b1d0e"/>
+      <ellipse cx="123" cy="95" rx="5" ry="6" fill="#2b1d0e"/>
+      <circle cx="98.5" cy="93.5" r="1.5" fill="white"/>
+      <circle cx="124.5" cy="93.5" r="1.5" fill="white"/>
+      <!-- MUSTACHE -->
+      <g class="mustache-glow">
+        <path d="M85 113 Q92 107 100 110 Q107 112 110 110 Q113 108 120 107 Q128 106 135 113 Q128 118 120 115 Q113 117 110 115 Q107 113 100 116 Q92 119 85 113 Z" fill="#c8922a"/>
+        <path d="M85 113 Q92 109 100 111 Q107 113 110 111" stroke="#f0c060" stroke-width="1" fill="none"/>
+        <path d="M110 111 Q113 109 120 108 Q128 107 135 113" stroke="#f0c060" stroke-width="1" fill="none"/>
+      </g>
+      <!-- smile -->
+      <path d="M98 122 Q110 129 122 122" stroke="#3a2010" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- boots -->
+      <rect x="82" y="188" width="22" height="18" rx="5" fill="#1a0e2e"/>
+      <rect x="116" y="188" width="22" height="18" rx="5" fill="#1a0e2e"/>
+      <!-- fist up -->
+      <rect x="145" y="130" width="20" height="30" rx="8" fill="#e8c99a"/>
+      <path d="M148 130 Q155 118 162 122" stroke="#e8c99a" stroke-width="6" stroke-linecap="round" fill="none"/>
+    </svg>
+  </div>
+
+  <div class="title-text">SuperWyndfal<br>&amp; The Glorious Mustache</div>
+  <div class="subtitle-text">A tale of pride, heartbreak, and magnificent facial hair</div>
+  <div class="scroll-hint">↓ scroll to read ↓</div>
+</div>
+
+<!-- ════════════════ PAGES ════════════════ -->
+<div class="pages">
+
+  <!-- PAGE 1 – The Pride -->
+  <div class="page" data-page>
+    <div class="page-inner">
+      <div class="page-art">
+        <div class="art-bg"></div>
+        <!-- Mirror scene -->
+        <svg viewBox="0 0 240 260" width="240" xmlns="http://www.w3.org/2000/svg" style="position:relative;z-index:1">
+          <!-- mirror frame -->
+          <rect x="60" y="20" width="120" height="150" rx="8" fill="none" stroke="#c8922a" stroke-width="5"/>
+          <rect x="68" y="28" width="104" height="134" rx="4" fill="#1a2a3a" opacity=".8"/>
+          <!-- mirror reflection -->
+          <ellipse cx="120" cy="80" rx="28" ry="30" fill="#e8c99a" opacity=".7"/>
+          <path d="M95 98 Q100 93 108 95 Q114 97 120 95 Q126 93 132 93 Q140 92 145 98 Q140 103 132 100 Q126 102 120 100 Q114 98 108 101 Q100 104 95 98 Z" fill="#f0c060" opacity=".9"/>
+          <!-- hero admiring -->
+          <ellipse cx="120" cy="185" rx="28" ry="30" fill="#e8c99a"/>
+          <path d="M98 200 Q104 195 112 197 Q118 199 120 197 Q122 195 128 194 Q136 193 142 199 Q136 204 128 201 Q122 203 120 201 Q118 199 112 202 Q104 205 98 200 Z" fill="#c8922a" class="mustache-glow"/>
+          <rect x="96" y="212" width="48" height="40" rx="8" fill="#2563a8"/>
+          <!-- sparkles around mustache -->
+          <text x="55" y="205" font-size="14" fill="#f0c060" opacity=".8">✦</text>
+          <text x="170" y="195" font-size="12" fill="#f0c060" opacity=".7">✦</text>
+          <text x="80" y="175" font-size="10" fill="#f0c060" opacity=".6">✦</text>
+          <!-- trophy -->
+          <text x="170" y="90" font-size="28">🏆</text>
+          <text x="8" y="100" font-size="22">⭐</text>
+        </svg>
+      </div>
+      <div class="page-text">
+        <div class="chapter">Chapter I</div>
+        <div class="page-title">The Most Magnificent Mustache in All the Realm</div>
+        <div class="ornament">— ❧ —</div>
+        <div class="page-body">
+          In the grand city of Wyndfalia, there lived a hero unlike any other. SuperWyndfal was tall, brave, and capable of leaping entire city blocks in a single bound.<br><br>
+          But his truest source of pride — the treasure above all treasures — was his <em>mustache</em>. Golden as autumn wheat, curled at both tips like twin crescent moons, it shimmered in sunlight and glowed softly in the dark.<br><br>
+          Every morning, SuperWyndfal would stand before his mirror for precisely seventeen minutes, admiring its magnificent sweep. "You," he would whisper, "are absolutely perfect."
+        </div>
+        <div class="page-number">1</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 2 – The Separation -->
+  <div class="page" data-page>
+    <div class="page-inner reverse">
+      <div class="page-art">
+        <div class="art-bg" style="background:radial-gradient(ellipse at 40% 60%, #1a0a0a, #0d0820)"></div>
+        <svg viewBox="0 0 240 260" width="240" xmlns="http://www.w3.org/2000/svg" style="position:relative;z-index:1">
+          <!-- wind lines -->
+          <path d="M-10 80 Q60 70 120 90 Q180 110 250 80" stroke="#a0c4ff" stroke-width="2" fill="none" opacity=".4" stroke-dasharray="8 4"/>
+          <path d="M-10 120 Q70 100 150 130 Q200 145 250 110" stroke="#a0c4ff" stroke-width="1.5" fill="none" opacity=".3" stroke-dasharray="6 5"/>
+          <!-- hero sad, mustache-less -->
+          <ellipse cx="90" cy="110" rx="30" ry="32" fill="#e8c99a"/>
+          <path d="M65 96 Q70 72 90 69 Q110 72 115 96" fill="#3a2010"/>
+          <ellipse cx="79" cy="108" rx="4" ry="5" fill="#2b1d0e"/>
+          <ellipse cx="102" cy="108" rx="4" ry="5" fill="#2b1d0e"/>
+          <!-- sad mouth -->
+          <path d="M78 128 Q90 122 102 128" stroke="#3a2010" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- empty mustache space (dotted) -->
+          <path d="M68 120 Q78 113 90 116 Q100 119 100 116 Q102 114 110 113 Q118 112 124 120" stroke="#c8922a" stroke-width="2" fill="none" stroke-dasharray="4 3" opacity=".4"/>
+          <!-- tear -->
+          <ellipse cx="78" cy="120" rx="2" ry="3" fill="#a0c4ff" opacity=".7"/>
+          <rect x="62" y="138" width="56" height="52" rx="10" fill="#2563a8"/>
+          <!-- mustache flying away -->
+          <g style="animation:windBlow 3s ease-in-out 1s forwards">
+            <path d="M150 85 Q157 79 165 82 Q172 84 175 82 Q178 80 184 79 Q192 78 198 85 Q192 90 184 87 Q178 89 175 87 Q172 85 165 88 Q157 91 150 85 Z" fill="#c8922a"/>
+          </g>
+          <!-- villain hand -->
+          <path d="M185 60 Q200 50 210 65 Q215 75 205 78" stroke="#8b3a1e" stroke-width="8" stroke-linecap="round" fill="none"/>
+          <text x="195" y="52" font-size="18">💨</text>
+          <!-- cape flailing -->
+          <path d="M62 145 Q50 175 35 195 Q80 182 118 195 Q115 170 118 145" fill="#5c1a2e" opacity=".8"/>
+          <path d="M62 145 Q50 165 38 180" stroke="#3d0f1e" stroke-width="1" fill="none"/>
+        </svg>
+      </div>
+      <div class="page-text">
+        <div class="chapter">Chapter II</div>
+        <div class="page-title">Carried Away by the Wicked Wind</div>
+        <div class="ornament">— ❧ —</div>
+        <div class="page-body">
+          One dreadful Tuesday, the villain Baron Von Gustwick — a man with no mustache of his own and a great deal of jealousy about it — unleashed the <em>Cyclone of Catastrophe</em> upon Wyndfalia.<br><br>
+          In the chaos, as SuperWyndfal flew bravely into the gale, an impossible gust swept clean across his upper lip. With a sound like a tiny violin, the mustache detached and was carried off into the swirling grey sky.<br><br>
+          SuperWyndfal landed on a rooftop. He reached up. His lip was bare. Cold. Smooth. <em>Wrong.</em><br><br>
+          For the first time in his heroic life, SuperWyndfal sat down in the middle of a crisis and simply... stared into the distance.
+        </div>
+        <div class="page-number">2</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 3 – The Search -->
+  <div class="page" data-page>
+    <div class="page-inner">
+      <div class="page-art">
+        <div class="art-bg" style="background:radial-gradient(ellipse at 50% 70%, #0a1a2e, #0d0820)"></div>
+        <svg viewBox="0 0 240 270" width="240" xmlns="http://www.w3.org/2000/svg" style="position:relative;z-index:1">
+          <!-- city silhouette -->
+          <rect x="0" y="200" width="240" height="70" fill="#0d1a2a"/>
+          <rect x="10" y="160" width="30" height="110" fill="#0d1a2a"/>
+          <rect x="50" y="140" width="40" height="130" fill="#0d1a2a"/>
+          <rect x="150" y="150" width="35" height="120" fill="#0d1a2a"/>
+          <rect x="195" y="170" width="45" height="100" fill="#0d1a2a"/>
+          <!-- windows -->
+          <rect x="18" y="170" width="6" height="8" fill="#f0c060" opacity=".6"/>
+          <rect x="28" y="170" width="6" height="8" fill="#f0c060" opacity=".3"/>
+          <rect x="60" y="155" width="6" height="8" fill="#f0c060" opacity=".7"/>
+          <rect x="72" y="155" width="6" height="8" fill="#f0c060" opacity=".2"/>
+          <rect x="60" y="172" width="6" height="8" fill="#f0c060" opacity=".5"/>
+          <!-- searchlight -->
+          <line x1="30" y1="155" x2="120" y2="50" stroke="#f0e080" stroke-width="2" opacity=".3" style="animation:searchLight 3s ease-in-out infinite;transform-origin:30px 155px"/>
+          <circle cx="30" cy="158" r="6" fill="#f0e080"/>
+          <!-- hero flying with magnifying glass -->
+          <ellipse cx="150" cy="90" rx="25" ry="27" fill="#e8c99a"/>
+          <path d="M128 77 Q133 57 150 55 Q167 57 172 77" fill="#3a2010"/>
+          <ellipse cx="141" cy="88" rx="4" ry="5" fill="#2b1d0e"/>
+          <ellipse cx="161" cy="88" rx="4" ry="5" fill="#2b1d0e"/>
+          <!-- worried eyebrows -->
+          <path d="M138 82 Q141 78 145 80" stroke="#3a2010" stroke-width="2" fill="none"/>
+          <path d="M157 80 Q161 78 164 82" stroke="#3a2010" stroke-width="2" fill="none"/>
+          <!-- sad mouth no stache -->
+          <path d="M142 106 Q150 100 158 106" stroke="#3a2010" stroke-width="2" fill="none"/>
+          <path d="M128 107 Q138 101 148 104 Q152 106 155 104 Q163 101 168 101" stroke="#c8922a" stroke-width="1.5" fill="none" stroke-dasharray="3 3" opacity=".35"/>
+          <rect x="128" y="115" width="44" height="40" rx="8" fill="#2563a8"/>
+          <!-- cape flying -->
+          <path d="M128 120 Q118 140 110 165 Q145 155 172 165 Q168 140 172 120" fill="#5c1a2e" opacity=".9"/>
+          <!-- magnifying glass -->
+          <circle cx="185" cy="75" r="18" stroke="#c8922a" stroke-width="3" fill="none"/>
+          <line x1="198" y1="88" x2="210" y2="100" stroke="#c8922a" stroke-width="3" stroke-linecap="round"/>
+          <circle cx="185" cy="75" r="13" fill="#a0c4ff" opacity=".15"/>
+          <!-- question marks floating -->
+          <text x="30" y="100" font-size="18" fill="#f0c060" opacity=".5">?</text>
+          <text x="60" y="65" font-size="14" fill="#f0c060" opacity=".4">?</text>
+          <text x="190" y="140" font-size="16" fill="#f0c060" opacity=".45">?</text>
+          <!-- rain drops -->
+          <ellipse cx="95" cy="40" rx="1.5" ry="5" fill="#a0c4ff" opacity=".4" style="animation:rainDrop 1.8s ease-in 0s infinite"/>
+          <ellipse cx="110" cy="25" rx="1.5" ry="5" fill="#a0c4ff" opacity=".3" style="animation:rainDrop 1.8s ease-in .4s infinite"/>
+          <ellipse cx="80" cy="55" rx="1.5" ry="5" fill="#a0c4ff" opacity=".35" style="animation:rainDrop 1.8s ease-in .9s infinite"/>
+          <ellipse cx="130" cy="30" rx="1.5" ry="5" fill="#a0c4ff" opacity=".25" style="animation:rainDrop 1.8s ease-in 1.2s infinite"/>
+        </svg>
+      </div>
+      <div class="page-text">
+        <div class="chapter">Chapter III</div>
+        <div class="page-title">A Hero Without His Mustache Is Half a Hero</div>
+        <div class="ornament">— ❧ —</div>
+        <div class="page-body">
+          SuperWyndfal searched everywhere. He scoured rooftops and rain gutters. He interrogated pigeons. He hovered over the city for three nights, his bare lip cold in the wind, scanning every alley with his Wyndfal-Vision™.<br><br>
+          Citizens whispered. <em>"Is he... different?"</em> children asked, pointing. He was. He felt hollow. He defeated Baron Von Gustwick that week, yes, but without flair. Without panache. Without the magnificent golden swoop that made his enemies tremble.<br><br>
+          Winning had never felt so terribly mediocre.
+        </div>
+        <div class="page-number">3</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 4 – The Reunion -->
+  <div class="page" data-page>
+    <div class="page-inner reverse">
+      <div class="page-art">
+        <div class="art-bg" style="background:radial-gradient(ellipse at 50% 40%, #1a2e1a, #0d0820)"></div>
+        <svg viewBox="0 0 240 270" width="240" xmlns="http://www.w3.org/2000/svg" style="position:relative;z-index:1">
+          <!-- clouds / sky -->
+          <ellipse cx="60" cy="45" rx="40" ry="22" fill="#2a3a2a" opacity=".6"/>
+          <ellipse cx="180" cy="35" rx="35" ry="18" fill="#2a3a2a" opacity=".5"/>
+          <!-- sun rays -->
+          <circle cx="120" cy="50" r="22" fill="#f0c060" opacity=".15"/>
+          <circle cx="120" cy="50" r="14" fill="#f0c060" opacity=".3"/>
+          <!-- hero body -->
+          <rect x="92" y="148" width="56" height="55" rx="10" fill="#2563a8"/>
+          <ellipse cx="120" cy="122" rx="32" ry="34" fill="#e8c99a"/>
+          <path d="M92 108 Q97 83 120 80 Q143 83 148 108" fill="#3a2010"/>
+          <!-- eyes wide with joy -->
+          <ellipse cx="109" cy="118" rx="6" ry="7" fill="#2b1d0e"/>
+          <ellipse cx="131" cy="118" rx="6" ry="7" fill="#2b1d0e"/>
+          <circle cx="111" cy="116" r="2" fill="white"/>
+          <circle cx="133" cy="116" r="2" fill="white"/>
+          <!-- happy eyebrows -->
+          <path d="M104 110 Q109 106 115 108" stroke="#3a2010" stroke-width="2.5" fill="none"/>
+          <path d="M125 108 Q131 106 136 110" stroke="#3a2010" stroke-width="2.5" fill="none"/>
+          <!-- MUSTACHE RETURNING! -->
+          <g style="animation:reunion 1.5s ease-out 0.5s both">
+            <path d="M88 138 Q96 130 106 133 Q114 136 120 133 Q126 131 134 130 Q144 129 152 138 Q144 144 134 141 Q126 143 120 141 Q114 139 106 142 Q96 145 88 138 Z" fill="#c8922a" class="mustache-glow"/>
+            <path d="M88 138 Q96 133 106 135 Q114 137 120 134" stroke="#f0c060" stroke-width="1.5" fill="none"/>
+            <path d="M120 134 Q126 132 134 131 Q144 130 152 138" stroke="#f0c060" stroke-width="1.5" fill="none"/>
+          </g>
+          <!-- big smile -->
+          <path d="M104 153 Q120 163 136 153" stroke="#3a2010" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+          <!-- cape heroic -->
+          <path d="M92 155 Q78 185 62 210 Q110 195 158 210 Q155 185 158 155" fill="#5c1a2e"/>
+          <!-- hearts floating up -->
+          <text x="155" y="105" font-size="18" fill="#e06090" style="animation:heartPop 1s ease-out 1s both">♥</text>
+          <text x="62" y="115" font-size="14" fill="#e06090" style="animation:heartPop 1s ease-out 1.3s both">♥</text>
+          <text x="130" y="78" font-size="12" fill="#e06090" style="animation:heartPop 1s ease-out 1.6s both">♥</text>
+          <!-- sparkles -->
+          <text x="48" y="145" font-size="16" fill="#f0c060" opacity=".8">✦</text>
+          <text x="178" y="130" font-size="14" fill="#f0c060" opacity=".7">✦</text>
+          <text x="100" y="78" font-size="10" fill="#f0c060" opacity=".6">✦</text>
+          <!-- boots -->
+          <rect x="98" y="196" width="20" height="16" rx="5" fill="#1a0e2e"/>
+          <rect x="122" y="196" width="20" height="16" rx="5" fill="#1a0e2e"/>
+        </svg>
+      </div>
+      <div class="page-text">
+        <div class="chapter">Chapter IV</div>
+        <div class="page-title">The Glorious Return</div>
+        <div class="ornament">— ❧ —</div>
+        <div class="page-body">
+          On the seventh day, a small sparrow landed on SuperWyndfal's windowsill. In its beak — curled at both tips, golden and gleaming — was the mustache.<br><br>
+          It had been found in a fountain in the Merchant's Quarter, gently resting in the water, perfectly preserved, still faintly glowing.<br><br>
+          With trembling hands, SuperWyndfal pressed it back into place.<br><br>
+          <em>Click.</em><br><br>
+          It fit like it had never left. A warmth spread across his face. The golden shimmer returned. Three nearby streetlamps brightened spontaneously. A dog three blocks away barked with what could only be described as approval.
+        </div>
+        <div class="page-number">4</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAGE 5 – Happily Ever After -->
+  <div class="page" data-page>
+    <div class="page-inner">
+      <div class="page-art">
+        <div class="art-bg" style="background:radial-gradient(ellipse at 50% 30%, #2e2a0a, #1a0e2e)"></div>
+        <svg viewBox="0 0 240 270" width="240" xmlns="http://www.w3.org/2000/svg" style="position:relative;z-index:1">
+          <!-- sunrise -->
+          <defs>
+            <radialGradient id="sun" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="#f0e060" stop-opacity=".9"/>
+              <stop offset="100%" stop-color="#c8922a" stop-opacity="0"/>
+            </radialGradient>
+          </defs>
+          <circle cx="120" cy="55" r="45" fill="url(#sun)"/>
+          <circle cx="120" cy="55" r="22" fill="#f0e060" opacity=".6"/>
+          <!-- sun rays -->
+          <g opacity=".35" stroke="#f0c060" stroke-width="2">
+            <line x1="120" y1="5" x2="120" y2="18"/>
+            <line x1="155" y1="20" x2="146" y2="30"/>
+            <line x1="170" y1="55" x2="157" y2="55"/>
+            <line x1="85" y1="20" x2="94" y2="30"/>
+            <line x1="70" y1="55" x2="83" y2="55"/>
+          </g>
+          <!-- hero triumphant pose -->
+          <rect x="88" y="153" width="64" height="60" rx="10" fill="#2563a8"/>
+          <!-- S emblem -->
+          <circle cx="120" cy="178" r="16" fill="#c8922a" opacity=".9"/>
+          <text x="120" y="185" text-anchor="middle" font-family="serif" font-weight="900" font-size="19" fill="#1a0e2e">S</text>
+          <ellipse cx="120" cy="125" rx="33" ry="35" fill="#e8c99a"/>
+          <path d="M90 111 Q96 85 120 82 Q144 85 150 111" fill="#3a2010"/>
+          <ellipse cx="109" cy="121" rx="5" ry="6" fill="#2b1d0e"/>
+          <ellipse cx="131" cy="121" rx="5" ry="6" fill="#2b1d0e"/>
+          <circle cx="110.5" cy="119.5" r="2" fill="white"/>
+          <circle cx="132.5" cy="119.5" r="2" fill="white"/>
+          <!-- GLORIOUS MUSTACHE -->
+          <g class="mustache-glow">
+            <path d="M86 142 Q95 134 107 137 Q115 140 120 137 Q125 135 133 134 Q143 133 154 142 Q145 149 133 146 Q125 148 120 146 Q115 144 107 147 Q95 150 86 142 Z" fill="#c8922a"/>
+            <path d="M86 142 Q95 138 107 140 Q115 142 120 139" stroke="#f0c060" stroke-width="2" fill="none"/>
+            <path d="M120 139 Q125 137 133 136 Q143 135 154 142" stroke="#f0c060" stroke-width="2" fill="none"/>
+          </g>
+          <!-- huge grin -->
+          <path d="M104 158 Q120 169 136 158" stroke="#3a2010" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <!-- arm up triumphant -->
+          <rect x="150" y="155" width="18" height="28" rx="7" fill="#e8c99a"/>
+          <path d="M153 155 Q158 140 166 144" stroke="#e8c99a" stroke-width="6" stroke-linecap="round" fill="none"/>
+          <!-- cape billowing -->
+          <path d="M88 158 Q72 195 55 220 Q100 205 120 215 Q140 205 185 220 Q168 195 152 158" fill="#5c1a2e" style="animation:cape 3s ease-in-out infinite;transform-origin:120px 190px"/>
+          <!-- fireworks / sparkles -->
+          <text x="28" y="90" font-size="20">✨</text>
+          <text x="188" y="80" font-size="20">✨</text>
+          <text x="45" y="50" font-size="16">⭐</text>
+          <text x="180" y="115" font-size="14">⭐</text>
+          <text x="100" y="50" font-size="12" fill="#f0c060">✦</text>
+          <text x="150" y="50" font-size="12" fill="#f0c060">✦</text>
+          <!-- boots -->
+          <rect x="94" y="206" width="22" height="18" rx="5" fill="#1a0e2e"/>
+          <rect x="124" y="206" width="22" height="18" rx="5" fill="#1a0e2e"/>
+        </svg>
+      </div>
+      <div class="page-text">
+        <div class="chapter">Chapter V</div>
+        <div class="page-title">Together Again — And More Magnificent Than Ever</div>
+        <div class="ornament">— ❧ —</div>
+        <div class="page-body">
+          From that day forward, SuperWyndfal and his mustache were inseparable — literally. He had a tiny golden clasp installed, forged by the finest craftsdwarf in the Northern Mountains, just in case.<br><br>
+          He leapt taller. He flew faster. He saved no fewer than eleven kittens that same afternoon, each one gently deposited back in a tree by his magnificent, gleaming upper lip.<br><br>
+          And every morning, standing before the mirror for precisely seventeen minutes, SuperWyndfal would look at that golden, shimmering, utterly glorious mustache — and it would seem to shine back at him, as if to say:<br><br>
+          <em>"I never should have left. I love you too."</em>
+        </div>
+        <div class="page-number">5</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FINAL PAGE -->
+  <div class="final-page" data-page>
+    <div style="font-size:3rem;margin-bottom:1.5rem">👨‍🦱✨</div>
+    <div class="final-quote">"A hero is only as great as his mustache — and a mustache is only as great as the hero who wears it."</div>
+    <div class="final-author">— The Chronicles of Wyndfalia, Vol. III</div>
+    <div style="margin-top:3rem;color:rgba(255,255,255,.2);font-size:.75rem;letter-spacing:2px;text-transform:uppercase">The End</div>
+  </div>
+
+</div>
+
+<script>
+  // Stars
+  const s = document.getElementById('stars');
+  for(let i=0;i<80;i++){
+    const el=document.createElement('div');
+    el.className='star';
+    const sz=Math.random()*2.5+.5;
+    el.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;--d:${(Math.random()*3+2).toFixed(1)}s;animation-delay:${(Math.random()*4).toFixed(1)}s`;
+    s.appendChild(el);
+  }
+
+  // Scroll reveal
+  const pages = document.querySelectorAll('[data-page]');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+  }, {threshold: 0.12});
+  pages.forEach(p => obs.observe(p));
+</script>
+</body>
+</html>

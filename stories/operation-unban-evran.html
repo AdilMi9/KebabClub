@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operation: Free Evran</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c10;
+  --panel: #111520;
+  --border: #1e2a3a;
+  --accent: #e85d2f;
+  --blue: #2a7fff;
+  --water: #00c4e8;
+  --gold: #f0b429;
+  --green: #2ecc71;
+  --text: #d4cfc8;
+  --dim: #6a7080;
+  --red: #e83a2f;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  font-family: 'Crimson Pro', serif;
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ── NOISE TEXTURE OVERLAY ── */
+body::before {
+  content:'';
+  position:fixed;
+  inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events:none;
+  z-index:9999;
+  opacity:.4;
+}
+
+/* ── TITLE ── */
+.cover {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+  background: radial-gradient(ellipse at 50% 60%, #0d1829 0%, #0a0c10 70%);
+}
+.cover-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(42,127,255,.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(42,127,255,.07) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: gridPulse 6s ease-in-out infinite;
+}
+@keyframes gridPulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+.cover-scan {
+  position: absolute;
+  left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--blue), transparent);
+  animation: scan 4s linear infinite;
+  opacity: .4;
+}
+@keyframes scan { 0%{top:-3px} 100%{top:100%} }
+
+.operation-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .75rem;
+  letter-spacing: 4px;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: .3rem .9rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index:1;
+  animation: blink 2s step-end infinite;
+}
+@keyframes blink { 50%{opacity:.4} }
+
+.cover-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(3rem, 11vw, 7rem);
+  letter-spacing: 4px;
+  text-align: center;
+  color: white;
+  position: relative;
+  z-index: 1;
+  line-height: .95;
+  text-shadow: 0 0 60px rgba(232,93,47,.4), 3px 3px 0 rgba(232,93,47,.3);
+}
+.cover-title span { color: var(--accent); }
+.cover-sub {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: clamp(.75rem, 2vw, 1rem);
+  color: var(--dim);
+  margin-top: 1.2rem;
+  letter-spacing: 2px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+.cover-sub em { color: var(--gold); font-style: normal; }
+
+/* pigeon blizzard logo spoof */
+.blizzard-spoof {
+  margin-top: 2rem;
+  position: relative;
+  z-index:1;
+  display: flex;
+  align-items: center;
+  gap: .8rem;
+  background: rgba(255,255,255,.04);
+  border: 1px solid var(--border);
+  padding: .6rem 1.4rem;
+  border-radius: 2px;
+}
+.blizzard-spoof .logo-text {
+  font-family: 'Bebas Neue', sans-serif;
+  letter-spacing: 2px;
+  font-size: 1.1rem;
+  color: var(--dim);
+}
+.blizzard-spoof .logo-text span { color: #4a9fff; }
+
+.scroll-cue {
+  margin-top: 3rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .7rem;
+  letter-spacing: 3px;
+  color: var(--dim);
+  animation: fadeUpDown 2s ease-in-out infinite;
+  position: relative;
+  z-index:1;
+}
+@keyframes fadeUpDown { 0%,100%{opacity:.2;transform:translateY(0)} 50%{opacity:.7;transform:translateY(6px)} }
+
+/* ── CHAPTERS ── */
+.chapters { max-width: 940px; margin: 0 auto; padding: 0 1rem 6rem; }
+
+.chapter-block {
+  margin: 4rem 0;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity .6s ease, transform .6s ease;
+}
+.chapter-block.vis { opacity:1; transform:translateY(0); }
+
+.ch-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.ch-number {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3.5rem;
+  color: var(--border);
+  line-height: 1;
+  min-width: 60px;
+}
+.ch-meta { flex:1; }
+.ch-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .65rem;
+  letter-spacing: 3px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+.ch-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  color: white;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+.ch-divider {
+  flex:1;
+  height: 1px;
+  background: linear-gradient(90deg, var(--border), transparent);
+}
+
+.ch-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  padding: 2rem;
+  position: relative;
+}
+.ch-body.flip { direction: rtl; }
+.ch-body.flip > * { direction: ltr; }
+
+.ch-art {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 260px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ch-text { display: flex; flex-direction: column; justify-content: center; gap: .9rem; }
+.ch-text p { font-size: 1.05rem; line-height: 1.85; color: var(--text); }
+.ch-text p em { color: var(--gold); font-style: italic; }
+.ch-text p strong { color: white; }
+
+/* character tags */
+.char-tag {
+  display: inline-block;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .65rem;
+  padding: .15rem .5rem;
+  border-radius: 2px;
+  margin: 0 .1rem;
+  vertical-align: middle;
+}
+.tag-evran   { background: rgba(240,180,41,.15); color: var(--gold); border: 1px solid rgba(240,180,41,.3); }
+.tag-ignite  { background: rgba(232,93,47,.15);  color: var(--accent); border: 1px solid rgba(232,93,47,.3); }
+.tag-hydro   { background: rgba(0,196,232,.15);  color: var(--water); border: 1px solid rgba(0,196,232,.3); }
+.tag-whisp   { background: rgba(46,204,113,.15); color: var(--green); border: 1px solid rgba(46,204,113,.3); }
+.tag-other   { background: rgba(255,255,255,.07); color: #aaa; border: 1px solid rgba(255,255,255,.15); }
+
+/* dialogue boxes */
+.dialogue {
+  border-left: 2px solid var(--border);
+  padding: .4rem .9rem;
+  margin: .4rem 0;
+  font-style: italic;
+  color: #bbb;
+  font-size: .97rem;
+}
+.dialogue .speaker {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .7rem;
+  font-style: normal;
+  letter-spacing: 1px;
+  margin-bottom: .15rem;
+}
+.dialogue.evran   { border-color: var(--gold);   } .dialogue.evran   .speaker { color: var(--gold); }
+.dialogue.ignite  { border-color: var(--accent);  } .dialogue.ignite  .speaker { color: var(--accent); }
+.dialogue.hydro   { border-color: var(--water);   } .dialogue.hydro   .speaker { color: var(--water); }
+.dialogue.whisp   { border-color: var(--green);   } .dialogue.whisp   .speaker { color: var(--green); }
+.dialogue.anduin  { border-color: #c080ff;        } .dialogue.anduin  .speaker { color: #c080ff; }
+.dialogue.lapi    { border-color: #80d4c0;        } .dialogue.lapi    .speaker { color: #80d4c0; }
+.dialogue.ana     { border-color: #d080d0;        } .dialogue.ana     .speaker { color: #d080d0; }
+.dialogue.rolex   { border-color: #f0d060;        } .dialogue.rolex   .speaker { color: #f0d060; }
+.dialogue.tista   { border-color: #ff9090;        } .dialogue.tista   .speaker { color: #ff9090; }
+.dialogue.violet  { border-color: #9090c0;        } .dialogue.violet  .speaker { color: #9090c0; }
+.dialogue.burz    { border-color: #a0a0a0;        } .dialogue.burz    .speaker { color: #a0a0a0; }
+.dialogue.jowisz  { border-color: #60d060;        } .dialogue.jowisz  .speaker { color: #60d060; }
+.dialogue.blood   { border-color: #d06060;        } .dialogue.blood   .speaker { color: #d06060; }
+
+/* ── SVG ART ANIMATIONS ── */
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+@keyframes shake { 0%,100%{transform:rotate(0deg)} 20%{transform:rotate(-6deg)} 60%{transform:rotate(5deg)} 80%{transform:rotate(-3deg)} }
+@keyframes typeFlicker { 0%,100%{opacity:1} 45%{opacity:.5} 50%{opacity:1} }
+@keyframes waterRipple { 0%{transform:scale(1);opacity:.6} 100%{transform:scale(2.5);opacity:0} }
+@keyframes scanH { 0%{transform:translateX(-100%)} 100%{transform:translateX(400%)} }
+@keyframes alarm { 0%,100%{fill:#e83a2f;opacity:.8} 50%{fill:#ff6060;opacity:1} }
+@keyframes kebabSpin { 0%{transform:rotate(0deg)} 100%{transform:rotate(360deg)} }
+@keyframes pigeonWalk { 0%,100%{transform:translateX(0) scaleX(1)} 40%{transform:translateX(6px) scaleX(1)} 41%{transform:translateX(6px) scaleX(-1)} 80%{transform:translateX(0) scaleX(-1)} 81%{transform:translateX(0) scaleX(1)} }
+@keyframes doorOpen { 0%{transform:scaleX(1)} 100%{transform:scaleX(0);transform-origin:left} }
+@keyframes typeCursor { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes celebrate { 0%,100%{transform:translateY(0) rotate(0)} 25%{transform:translateY(-12px) rotate(-5deg)} 75%{transform:translateY(-8px) rotate(4deg)} }
+@keyframes rainDrop { 0%{transform:translateY(-10px);opacity:0} 20%{opacity:.6} 100%{transform:translateY(60px);opacity:0} }
+
+@media(max-width:600px){
+  .ch-body { grid-template-columns:1fr; }
+  .ch-body.flip { direction:ltr; }
+  .ch-art { min-height:200px; }
+}
+
+/* epilogue */
+.epilogue {
+  max-width:940px;
+  margin: 2rem auto 0;
+  padding: 3rem 2rem 5rem;
+  text-align:center;
+  opacity:0;
+  transform:translateY(30px);
+  transition: opacity .7s ease, transform .7s ease;
+}
+.epilogue.vis { opacity:1; transform:translateY(0); }
+.epilogue-title {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(2rem,5vw,3.2rem);
+  color: var(--gold);
+  letter-spacing:3px;
+  text-shadow: 0 0 30px rgba(240,180,41,.4);
+}
+.epilogue-body {
+  max-width:620px;
+  margin: 1.2rem auto 0;
+  font-size:1.1rem;
+  line-height:1.9;
+  color: var(--dim);
+}
+.epilogue-body em { color: var(--text); font-style:italic; }
+.fin-tag {
+  margin-top:2.5rem;
+  font-family:'Share Tech Mono',monospace;
+  font-size:.7rem;
+  letter-spacing:4px;
+  color: var(--border);
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════ COVER ══════════ -->
+<div class="cover">
+  <div class="cover-grid"></div>
+  <div class="cover-scan"></div>
+  <div class="operation-tag">▶ CLASSIFIED OPERATION ◀</div>
+  <div class="cover-title">OPERATION:<br><span>FREE EVRAN</span></div>
+  <div class="cover-sub">A Heist in Five Acts &nbsp;|&nbsp; Target: <em>Pigeon Entertainment HQ</em></div>
+  <div class="blizzard-spoof">
+    <svg width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="13" fill="none" stroke="#4a9fff" stroke-width="1.5"/><text x="14" y="19" text-anchor="middle" font-size="14">🐦</text></svg>
+    <div class="logo-text"><span>PIGEON</span> ENTERTAINMENT</div>
+  </div>
+  <div class="scroll-cue">▼ SCROLL TO DEPLOY ▼</div>
+</div>
+
+<!-- ══════════ CHAPTERS ══════════ -->
+<div class="chapters">
+
+  <!-- ── CH 1 ── THE INCIDENT ── -->
+  <div class="chapter-block" data-ch>
+    <div class="ch-header">
+      <div class="ch-number">01</div>
+      <div class="ch-meta">
+        <div class="ch-label">Act One</div>
+        <div class="ch-title">The Word That Started It All</div>
+      </div>
+      <div class="ch-divider"></div>
+    </div>
+    <div class="ch-body">
+      <div class="ch-art">
+        <!-- BAN SCREEN SCENE -->
+        <svg viewBox="0 0 260 240" width="260" xmlns="http://www.w3.org/2000/svg">
+          <!-- monitor -->
+          <rect x="30" y="20" width="200" height="150" rx="4" fill="#0d1020" stroke="#1e2a3a" stroke-width="2"/>
+          <rect x="38" y="28" width="184" height="134" rx="2" fill="#0a0e18"/>
+          <!-- red ban screen -->
+          <rect x="38" y="28" width="184" height="134" rx="2" fill="#1a0505" opacity=".95"/>
+          <text x="130" y="75" text-anchor="middle" font-size="32" style="animation:shake 1.2s ease-in-out infinite">🚫</text>
+          <text x="130" y="105" text-anchor="middle" font-family="monospace" font-size="10" fill="#e83a2f" style="animation:typeFlicker 1.5s ease infinite">ACCOUNT SUSPENDED</text>
+          <text x="130" y="120" text-anchor="middle" font-family="monospace" font-size="7" fill="#804040">Reason: calling user a moron</text>
+          <text x="130" y="133" text-anchor="middle" font-family="monospace" font-size="7" fill="#604040">Duration: 7 days</text>
+          <!-- scan line -->
+          <rect x="38" y="0" width="184" height="4" fill="rgba(232,58,47,.3)" rx="2" style="animation:scanH 2s linear infinite"/>
+          <!-- stand -->
+          <rect x="110" y="170" width="40" height="12" rx="2" fill="#1e2a3a"/>
+          <rect x="95" y="182" width="70" height="6" rx="2" fill="#1e2a3a"/>
+          <!-- Evran shocked -->
+          <ellipse cx="130" cy="215" rx="18" ry="18" fill="#c8a060"/>
+          <ellipse cx="124" cy="211" rx="3" ry="3.5" fill="#2b1d0e"/>
+          <ellipse cx="136" cy="211" rx="3" ry="3.5" fill="#2b1d0e"/>
+          <!-- big O mouth -->
+          <ellipse cx="130" cy="221" rx="4" ry="5" fill="#2b1d0e"/>
+          <!-- kebab nearby - it droops in sadness -->
+          <line x1="155" y1="198" x2="155" y2="230" stroke="#8b4513" stroke-width="3" stroke-linecap="round"/>
+          <ellipse cx="155" cy="208" rx="7" ry="4" fill="#c8602a" opacity=".9"/>
+          <ellipse cx="155" cy="214" rx="6" ry="3.5" fill="#a04520" opacity=".85"/>
+          <ellipse cx="155" cy="220" rx="7" ry="4" fill="#c8602a" opacity=".9"/>
+          <!-- drooping -->
+          <path d="M155 224 Q162 230 158 236" stroke="#8b4513" stroke-width="2" fill="none" opacity=".5"/>
+        </svg>
+      </div>
+      <div class="ch-text">
+        <p>It began, as most catastrophes do, with a simple act of honesty.</p>
+        <p><strong>Teberdar</strong> — known to his circle as <em>Evran</em>, Kebab Master of the First Order, Devourer of Döners, Keeper of Secrets — had been playing an online game when he encountered a fellow player of such spectacular incompetence that the words simply... escaped him.</p>
+        <div class="dialogue evran"><div class="speaker">EVRAN</div>"You absolute moron."</div>
+        <p>Three words. One ban. Seven days.</p>
+        <p>The ban screen glowed red on his monitor. Somewhere, a kebab went uneaten. A pigeon outside his window tilted its head, as if even it understood the gravity of the situation.</p>
+        <div class="dialogue evran"><div class="speaker">EVRAN</div>"...I stand by what I said. He <em>was</em> a moron."</div>
+        <p>But standing by it didn't unban him. He picked up his phone and texted the group.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CH 2 ── THE BRIEFING ── -->
+  <div class="chapter-block" data-ch>
+    <div class="ch-header">
+      <div class="ch-number">02</div>
+      <div class="ch-meta">
+        <div class="ch-label">Act Two</div>
+        <div class="ch-title">The Gang Assembles</div>
+      </div>
+      <div class="ch-divider"></div>
+    </div>
+    <div class="ch-body flip">
+      <div class="ch-art">
+        <!-- GROUP CHAT / WAR ROOM -->
+        <svg viewBox="0 0 260 250" width="260" xmlns="http://www.w3.org/2000/svg">
+          <!-- table -->
+          <ellipse cx="130" cy="145" rx="100" ry="38" fill="#1a2030" stroke="#1e2a3a" stroke-width="1.5"/>
+          <!-- kebab on table - centerpiece -->
+          <line x1="130" y1="115" x2="130" y2="155" stroke="#8b4513" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="130" cy="122" rx="10" ry="6" fill="#c8602a"/>
+          <ellipse cx="130" cy="130" rx="9" ry="5" fill="#a04520"/>
+          <ellipse cx="130" cy="137" rx="10" ry="6" fill="#c8602a"/>
+          <text x="130" y="112" text-anchor="middle" font-size="8" fill="#f0c060">★</text>
+          <!-- characters around table - simplified busts -->
+          <!-- Ignite (top left) -->
+          <ellipse cx="55" cy="100" rx="16" ry="17" fill="#e8a060"/>
+          <path d="M42 88 Q46 72 55 70 Q64 72 68 88" fill="#3a2010"/>
+          <text x="55" y="125" text-anchor="middle" font-family="monospace" font-size="7" fill="#e85d2f">IGNITE</text>
+          <!-- flame on head -->
+          <path d="M50 70 Q55 58 60 68 Q58 62 55 68 Q52 62 50 70Z" fill="#ff6030" opacity=".8"/>
+          <!-- Hydrophilic (top right) -->
+          <ellipse cx="205" cy="100" rx="16" ry="17" fill="#d0c0a0"/>
+          <path d="M192 88 Q196 72 205 70 Q214 72 218 88" fill="#2a3040"/>
+          <text x="205" y="125" text-anchor="middle" font-family="monospace" font-size="7" fill="#00c4e8">HYDRO</text>
+          <!-- water droplet on head -->
+          <path d="M200 68 Q205 58 210 68 Q210 74 205 76 Q200 74 200 68Z" fill="#00c4e8" opacity=".7"/>
+          <!-- Whisp (bottom left) -->
+          <ellipse cx="55" cy="185" rx="16" ry="17" fill="#d4b896"/>
+          <text x="55" y="210" text-anchor="middle" font-family="monospace" font-size="7" fill="#2ecc71">WHISP</text>
+          <!-- Anduin (bottom right) -->
+          <ellipse cx="205" cy="185" rx="16" ry="17" fill="#b8a880"/>
+          <text x="205" y="210" text-anchor="middle" font-family="monospace" font-size="7" fill="#c080ff">ANDUIN</text>
+          <!-- Lapi (left mid) -->
+          <ellipse cx="35" cy="143" rx="14" ry="15" fill="#c0d0b0"/>
+          <text x="35" y="165" text-anchor="middle" font-family="monospace" font-size="6" fill="#80d4c0">LAPI</text>
+          <!-- Ana (right mid) -->
+          <ellipse cx="225" cy="143" rx="14" ry="15" fill="#d0a0c0"/>
+          <text x="225" y="165" text-anchor="middle" font-family="monospace" font-size="6" fill="#d080d0">ANA</text>
+          <!-- Evran (top center, glowing with rage/plan) -->
+          <ellipse cx="130" cy="65" rx="18" ry="19" fill="#c8a060"/>
+          <path d="M115 53 Q119 37 130 35 Q141 37 145 53" fill="#4a2a10"/>
+          <!-- determined eyes -->
+          <ellipse cx="124" cy="62" rx="3.5" ry="3" fill="#2b1d0e"/>
+          <ellipse cx="136" cy="62" rx="3.5" ry="3" fill="#2b1d0e"/>
+          <!-- plan papers on table -->
+          <rect x="100" y="138" width="22" height="16" rx="1" fill="#f0e8d0" transform="rotate(-8,110,146)"/>
+          <rect x="138" y="140" width="22" height="16" rx="1" fill="#f0e8d0" transform="rotate(5,148,148)"/>
+          <line x1="103" y1="143" x2="118" y2="143" stroke="#888" stroke-width="1"/>
+          <line x1="103" y1="147" x2="115" y2="147" stroke="#888" stroke-width="1"/>
+        </svg>
+      </div>
+      <div class="ch-text">
+        <p>Within the hour, the message had propagated through the group. The responses came in fast.</p>
+        <div class="dialogue ignite"><div class="speaker">IGNITE</div>"bro they BANNED you?? those absolute pigeons. also hydro probably caused this somehow"</div>
+        <div class="dialogue hydro"><div class="speaker">HYDROPHILIC</div>"why is it always me?? drink water, everyone, we need clear heads for this"</div>
+        <div class="dialogue whisp"><div class="speaker">WHISP</div>"that's rough Evran, honestly though are we really doing a whole heist over this"</div>
+        <div class="dialogue anduin"><div class="speaker">ANDUIN</div>"yeah let's go, I'm in, let's be friends with everyone there too"</div>
+        <div class="dialogue ana"><div class="speaker">ANA</div>"..."</div>
+        <div class="dialogue evran"><div class="speaker">EVRAN</div>"Ana, are you staring at a wall again?"</div>
+        <div class="dialogue ana"><div class="speaker">ANA</div>"the wall has secrets"</div>
+        <p>Evran laid a skewer of kebab on the table like a general placing a sword on a map. <em>"The target,"</em> he said, <em>"is Pigeon Entertainment HQ. They banned me. We unban me. Simple."</em></p>
+        <p>Everyone nodded. Even Ana, who was still technically looking at the wall.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CH 3 ── THE INFILTRATION ── -->
+  <div class="chapter-block" data-ch>
+    <div class="ch-header">
+      <div class="ch-number">03</div>
+      <div class="ch-meta">
+        <div class="ch-label">Act Three</div>
+        <div class="ch-title">Inside the Pigeon Tower</div>
+      </div>
+      <div class="ch-divider"></div>
+    </div>
+    <div class="ch-body">
+      <div class="ch-art">
+        <svg viewBox="0 0 260 260" width="260" xmlns="http://www.w3.org/2000/svg">
+          <!-- building exterior / lobby -->
+          <rect x="0" y="0" width="260" height="260" fill="#080c14"/>
+          <!-- floor tiles -->
+          <rect x="0" y="200" width="260" height="60" fill="#0d1220"/>
+          <line x1="0" y1="200" x2="260" y2="200" stroke="#1e2a3a" stroke-width="1"/>
+          <line x1="65" y1="200" x2="65" y2="260" stroke="#1e2a3a" stroke-width="1"/>
+          <line x1="130" y1="200" x2="130" y2="260" stroke="#1e2a3a" stroke-width="1"/>
+          <line x1="195" y1="200" x2="195" y2="260" stroke="#1e2a3a" stroke-width="1"/>
+          <!-- security desk -->
+          <rect x="80" y="168" width="100" height="32" rx="3" fill="#1a2030" stroke="#2a3a50" stroke-width="1"/>
+          <!-- guard pigeon -->
+          <text x="130" y="180" text-anchor="middle" font-size="20" style="animation:pigeonWalk 3s linear infinite">🐦</text>
+          <text x="130" y="192" text-anchor="middle" font-family="monospace" font-size="6" fill="#4a9fff">SECURITY</text>
+          <!-- Evran disguised as pigeon catcher (fake beard extra) -->
+          <ellipse cx="50" cy="210" rx="15" ry="16" fill="#c8a060"/>
+          <path d="M38 200 Q42 186 50 184 Q58 186 62 200" fill="#1a0a0a"/>
+          <!-- fake mustache disguise -->
+          <path d="M41 214 Q48 210 50 212 Q52 210 59 211 Q55 217 50 215 Q45 217 41 214Z" fill="#2a1a0a"/>
+          <text x="50" y="240" text-anchor="middle" font-family="monospace" font-size="6" fill="#f0b429">EVRAN</text>
+          <!-- Ignite and Hydro sneaking right -->
+          <ellipse cx="210" cy="210" rx="14" ry="15" fill="#e8a060"/>
+          <path d="M197 200 Q201 186 210 184 Q219 186 223 200" fill="#3a2010"/>
+          <path d="M202 200 Q206 188 210 192 Q214 188 218 200" fill="#ff4010" opacity=".7"/>
+          <text x="210" y="237" text-anchor="middle" font-family="monospace" font-size="6" fill="#e85d2f">IGNITE</text>
+          <ellipse cx="185" cy="213" rx="13" ry="14" fill="#d0c8b0"/>
+          <path d="M173 204 Q177 192 185 190 Q193 192 197 204" fill="#2a3040"/>
+          <path d="M180 190 Q185 183 190 190 Q190 186 185 188 Q180 186 180 190Z" fill="#00c4e8" opacity=".6"/>
+          <text x="185" y="237" text-anchor="middle" font-family="monospace" font-size="6" fill="#00c4e8">HYDRO</text>
+          <!-- Lapi in vent above (hacker) -->
+          <rect x="100" y="30" width="60" height="30" rx="2" fill="#0d1220" stroke="#1e2a3a" stroke-width="1.5"/>
+          <line x1="108" y1="30" x2="108" y2="60" stroke="#1e2a3a" stroke-width="1"/>
+          <line x1="116" y1="30" x2="116" y2="60" stroke="#1e2a3a" stroke-width="1"/>
+          <line x1="124" y1="30" x2="124" y2="60" stroke="#1e2a3a" stroke-width="1"/>
+          <line x1="132" y1="30" x2="132" y2="60" stroke="#1e2a3a" stroke-width="1"/>
+          <line x1="140" y1="30" x2="140" y2="60" stroke="#1e2a3a" stroke-width="1"/>
+          <line x1="148" y1="30" x2="148" y2="60" stroke="#1e2a3a" stroke-width="1"/>
+          <!-- eyes peering from vent -->
+          <ellipse cx="121" cy="55" rx="3" ry="2.5" fill="white"/>
+          <ellipse cx="139" cy="55" rx="3" ry="2.5" fill="white"/>
+          <ellipse cx="121" cy="55" rx="2" ry="2" fill="#2b1d0e"/>
+          <ellipse cx="139" cy="55" rx="2" ry="2" fill="#2b1d0e"/>
+          <text x="130" y="27" text-anchor="middle" font-family="monospace" font-size="6" fill="#80d4c0">LAPI</text>
+          <!-- alarm light -->
+          <circle cx="230" cy="30" r="12" fill="#1a0505" stroke="#e83a2f" stroke-width="1.5"/>
+          <circle cx="230" cy="30" r="7" style="animation:alarm 1.5s ease-in-out infinite"/>
+          <!-- Ana staring at a server rack -->
+          <rect x="5" y="100" width="25" height="80" rx="2" fill="#0d1828" stroke="#1e2a3a" stroke-width="1"/>
+          <rect x="9" y="108" width="17" height="4" rx="1" fill="#2a3a50"/>
+          <rect x="9" y="116" width="17" height="4" rx="1" fill="#2a3a50"/>
+          <rect x="9" y="124" width="17" height="4" rx="1" fill="#2a3a50"/>
+          <circle cx="22" cy="110" r="2" fill="#00ff88" opacity=".6"/>
+          <circle cx="22" cy="118" r="2" fill="#ff4040" opacity=".8" style="animation:alarm 2s ease-in-out infinite"/>
+          <ellipse cx="17" cy="95" rx="11" ry="12" fill="#d0a0c0"/>
+          <text x="17" y="90" text-anchor="middle" font-family="monospace" font-size="5" fill="#d080d0">ANA</text>
+          <!-- stare lines -->
+          <line x1="28" y1="95" x2="32" y2="110" stroke="#d080d0" stroke-width="1" stroke-dasharray="2 2" opacity=".5"/>
+        </svg>
+      </div>
+      <div class="ch-text">
+        <p>The plan had many layers. Evran summarized them over a döner he ate for morale.</p>
+        <p><strong>Lapi</strong> — quiet, competent, terrifyingly skilled — would handle the vents and the network access. Nobody asked how he knew about the ventilation layout. He simply did.</p>
+        <p><strong>Ignite</strong> and <strong>Hydrophilic</strong> would create a distraction at the main entrance.</p>
+        <div class="dialogue ignite"><div class="speaker">IGNITE</div>"easy. hydro, you flood the lobby"</div>
+        <div class="dialogue hydro"><div class="speaker">HYDROPHILIC</div>"that's not what my powers are for—"</div>
+        <div class="dialogue ignite"><div class="speaker">IGNITE</div>"retard, just make it slightly damp, they'll slip"</div>
+        <div class="dialogue hydro"><div class="speaker">HYDROPHILIC</div>"...I mean I <em>can</em> do that"</div>
+        <p><strong>Ana</strong> was assigned to monitor the server room. She found a wall in there and began staring at it almost immediately. Somehow, this was useful — the servers were unnerved and ran 12% slower.</p>
+        <div class="dialogue ana"><div class="speaker">ANA</div>"this wall has even more secrets than my wall at home"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CH 4 ── THE CHAOS ── -->
+  <div class="chapter-block" data-ch>
+    <div class="ch-header">
+      <div class="ch-number">04</div>
+      <div class="ch-meta">
+        <div class="ch-label">Act Four</div>
+        <div class="ch-title">Maximum Chaos, Minimum Plan</div>
+      </div>
+      <div class="ch-divider"></div>
+    </div>
+    <div class="ch-body flip">
+      <div class="ch-art">
+        <svg viewBox="0 0 260 260" width="260" xmlns="http://www.w3.org/2000/svg">
+          <!-- chaos scene -->
+          <rect x="0" y="0" width="260" height="260" fill="#080c14"/>
+          <!-- water on floor -->
+          <ellipse cx="130" cy="230" rx="110" ry="22" fill="#003344" opacity=".7"/>
+          <ellipse cx="80" cy="235" rx="60" ry="10" fill="#00c4e8" opacity=".15"/>
+          <!-- water ripples -->
+          <ellipse cx="130" cy="230" rx="50" ry="8" fill="none" stroke="#00c4e8" stroke-width="1" opacity=".3" style="animation:waterRipple 2s ease-out 0s infinite"/>
+          <ellipse cx="80" cy="235" rx="30" ry="5" fill="none" stroke="#00c4e8" stroke-width="1" opacity=".25" style="animation:waterRipple 2s ease-out .7s infinite"/>
+          <!-- Ignite sliding on water -->
+          <ellipse cx="60" cy="195" rx="16" ry="17" fill="#e8a060" style="animation:float 1s ease-in-out infinite"/>
+          <path d="M47 183 Q51 167 60 165 Q69 167 73 183" fill="#3a2010"/>
+          <path d="M52 182 Q57 168 60 172 Q63 168 68 182" fill="#ff4010" opacity=".9"/>
+          <!-- big grin on ignite -->
+          <path d="M52 200 Q60 208 68 200" stroke="#3a2010" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- Hydro controlling water proudly -->
+          <ellipse cx="190" cy="180" rx="16" ry="17" fill="#d0c8b0"/>
+          <path d="M177 168 Q181 152 190 150 Q199 152 203 168" fill="#2a3040"/>
+          <path d="M185 150 Q190 140 195 150 Q195 145 190 147 Q185 145 185 150Z" fill="#00c4e8" opacity=".8"/>
+          <!-- water arms raised -->
+          <path d="M175 175 Q165 165 158 170" stroke="#00c4e8" stroke-width="4" stroke-linecap="round" fill="none" opacity=".7"/>
+          <path d="M205 175 Q215 165 222 170" stroke="#00c4e8" stroke-width="4" stroke-linecap="round" fill="none" opacity=".7"/>
+          <!-- Evran at keyboard -->
+          <rect x="95" y="100" width="70" height="45" rx="3" fill="#0d1828" stroke="#1e2a3a" stroke-width="1.5"/>
+          <!-- screen text -->
+          <text x="130" y="118" text-anchor="middle" font-family="monospace" font-size="6" fill="#00ff88">ACCESSING BAN DB...</text>
+          <text x="130" y="130" text-anchor="middle" font-family="monospace" font-size="6" fill="#f0b429" style="animation:typeFlicker 1s infinite">USER: EVRAN ████</text>
+          <text x="130" y="142" text-anchor="middle" font-family="monospace" font-size="6" fill="#e83a2f">BAN: ACTIVE [7d]</text>
+          <!-- cursor blink -->
+          <rect x="162" y="138" width="4" height="7" fill="#00ff88" style="animation:typeCursor 1s step-end infinite"/>
+          <ellipse cx="130" cy="88" rx="17" ry="18" fill="#c8a060"/>
+          <path d="M116 76 Q120 60 130 58 Q140 60 144 76" fill="#4a2a10"/>
+          <ellipse cx="124" cy="86" rx="3.5" ry="3" fill="#2b1d0e"/>
+          <ellipse cx="136" cy="86" rx="3.5" ry="3" fill="#2b1d0e"/>
+          <!-- intense expression -->
+          <path d="M121 80 Q124 76 128 78" stroke="#4a2a10" stroke-width="2" fill="none"/>
+          <path d="M132 78 Q136 76 139 80" stroke="#4a2a10" stroke-width="2" fill="none"/>
+          <!-- Tista nearby -->
+          <ellipse cx="200" cy="95" rx="14" ry="15" fill="#c0a090"/>
+          <text x="200" y="118" text-anchor="middle" font-family="monospace" font-size="5.5" fill="#ff9090">TISTA</text>
+          <!-- Violentine leaning on wall calmly -->
+          <ellipse cx="28" cy="140" rx="13" ry="14" fill="#9090b0"/>
+          <text x="28" y="162" text-anchor="middle" font-family="monospace" font-size="5.5" fill="#9090c0">VIOLET</text>
+          <!-- Whisp looking exasperated -->
+          <ellipse cx="235" cy="140" rx="13" ry="14" fill="#d4b896"/>
+          <text x="235" y="162" text-anchor="middle" font-family="monospace" font-size="5.5" fill="#2ecc71">WHISP</text>
+          <!-- pigeon staff fleeing -->
+          <text x="60" y="55" font-size="16" style="animation:float 1.2s ease-in-out .2s infinite">🐦</text>
+          <text x="130" y="45" font-size="16" style="animation:float 1.2s ease-in-out .5s infinite">🐦</text>
+          <text x="200" y="55" font-size="16" style="animation:float 1.2s ease-in-out .8s infinite">🐦</text>
+          <!-- alarm everywhere -->
+          <circle cx="18" cy="18" r="8" style="animation:alarm 1s ease-in-out infinite"/>
+          <circle cx="242" cy="18" r="8" style="animation:alarm 1s ease-in-out .5s infinite"/>
+        </svg>
+      </div>
+      <div class="ch-text">
+        <p>The plan fell apart in the best possible way.</p>
+        <p>Hydrophilic had indeed made the lobby damp. Then a <em>bit</em> damper. Then the pipes started listening to him and the whole ground floor was ankle-deep in cheerfully hydrating water.</p>
+        <div class="dialogue ignite"><div class="speaker">IGNITE</div>"BRO this is amazing actually"</div>
+        <div class="dialogue hydro"><div class="speaker">HYDROPHILIC</div>"everyone stay hydrated!! this is fine!!"</div>
+        <p>Alarms went off. Pigeons scattered. <strong>Violentine</strong> found a wall to lean against and looked effortlessly composed while everyone else ran in circles around him. <strong>Whisp</strong> tried to keep spirits up — right up until the point Ignite started surfing on a document trolley.</p>
+        <div class="dialogue whisp"><div class="speaker">WHISP</div>"okay I'm supportive of this mission but I did NOT sign up for this level of chaos"</div>
+        <p>Meanwhile <strong>Tista</strong> stood faithfully beside Evran as he typed furiously at the admin terminal. Evran, without looking up:</p>
+        <div class="dialogue evran"><div class="speaker">EVRAN</div>"Tista if I don't crack this in three minutes I'm biting your tits, just so you know"</div>
+        <div class="dialogue tista"><div class="speaker">TISTA</div>"...noted"</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── CH 5 ── THE CAVALRY + UNBAN ── -->
+  <div class="chapter-block" data-ch>
+    <div class="ch-header">
+      <div class="ch-number">05</div>
+      <div class="ch-meta">
+        <div class="ch-label">Act Five</div>
+        <div class="ch-title">Everyone Shows Up (Even the Rare Ones)</div>
+      </div>
+      <div class="ch-divider"></div>
+    </div>
+    <div class="ch-body">
+      <div class="ch-art">
+        <svg viewBox="0 0 260 260" width="260" xmlns="http://www.w3.org/2000/svg">
+          <!-- victory / terminal screen -->
+          <rect x="0" y="0" width="260" height="260" fill="#050d10"/>
+          <!-- green terminal glow -->
+          <rect x="20" y="20" width="220" height="140" rx="4" fill="#001a10" stroke="#00ff88" stroke-width="1.5"/>
+          <rect x="28" y="30" width="204" height="122" rx="2" fill="#001208"/>
+          <!-- terminal text -->
+          <text x="36" y="52" font-family="monospace" font-size="7" fill="#00aa44">> LOCATING BAN RECORD: evran_kebabmaster...</text>
+          <text x="36" y="65" font-family="monospace" font-size="7" fill="#00aa44">> RECORD FOUND. STATUS: BANNED [6d 23h left]</text>
+          <text x="36" y="78" font-family="monospace" font-size="7" fill="#f0b429">> OVERRIDE CODE ENTERED BY: lapi_silent</text>
+          <text x="36" y="91" font-family="monospace" font-size="7" fill="#00c4e8">> HYDRO_DISTRACTION: confirmed (very wet)</text>
+          <text x="36" y="104" font-family="monospace" font-size="7" fill="#d080d0">> ANA_STARE: servers at 88% confusion</text>
+          <text x="36" y="117" font-family="monospace" font-size="7" fill="#60d060">> JOWISZ appeared from nowhere: access key found</text>
+          <text x="36" y="130" font-family="monospace" font-size="7" fill="#d06060">> BLOODLINE23 rode in: extra muscle confirmed</text>
+          <text x="36" y="143" font-family="monospace" font-size="7" fill="#00ff88" style="animation:typeFlicker .8s infinite">▶ BAN STATUS: ████████ LIFTED ✓</text>
+          <!-- confetti / celebration -->
+          <text x="30" y="180" font-size="16" style="animation:celebrate 1s ease-in-out infinite">🎉</text>
+          <text x="220" y="180" font-size="16" style="animation:celebrate 1s ease-in-out .3s infinite">🎉</text>
+          <text x="125" y="175" font-size="18" style="animation:celebrate 1s ease-in-out .15s infinite">🕺</text>
+          <!-- kebab victory -->
+          <line x1="130" y1="200" x2="130" y2="250" stroke="#8b4513" stroke-width="4" stroke-linecap="round"/>
+          <ellipse cx="130" cy="208" rx="10" ry="6" fill="#c8602a"/>
+          <ellipse cx="130" cy="216" rx="9" ry="5" fill="#a04520"/>
+          <ellipse cx="130" cy="223" rx="10" ry="6" fill="#c8602a"/>
+          <!-- little stars -->
+          <text x="55" y="175" font-size="12" fill="#f0b429">✦</text>
+          <text x="195" y="195" font-size="10" fill="#f0b429">✦</text>
+          <text x="80" y="200" font-size="8" fill="#f0b429">✦</text>
+          <!-- Rolex who showed up late -->
+          <text x="10" y="250" font-family="monospace" font-size="6" fill="#f0d060">ROLEX showed up after it was over</text>
+          <text x="10" y="258" font-family="monospace" font-size="6" fill="#a0a0a0">BURZUM: *appeared* *was chill* *left*</text>
+        </svg>
+      </div>
+      <div class="ch-text">
+        <p>That's when the unexpected reinforcements arrived.</p>
+        <p><strong>Jowisz</strong> appeared from around a corner nobody had noticed, producing a master access key from his pocket. No one knew how he'd gotten in. No one asked. He simply handed it over, nodded, and disappeared again into whatever dimension he usually occupied.</p>
+        <p><strong>Bloodline23</strong>, rare as a solar eclipse, materialized in the hallway looking entirely calm and extremely useful. He blocked the corridor while Lapi worked the terminal.</p>
+        <p>And <strong>Rolex</strong> — famously elusive — had actually <em>been</em> there the whole time. Nobody had noticed. He'd been in the corner being funny to a confused pigeon executive.</p>
+        <p><strong>Burzum</strong> showed up, acknowledged the situation with a single nod, contributed in some unclear but definitely real way, and then was simply... gone.</p>
+        <div class="dialogue evran"><div class="speaker">EVRAN</div>"<em>Lapi.</em>"</div>
+        <div class="dialogue lapi"><div class="speaker">LAPI</div>"done."</div>
+        <p>The screen turned green. The ban — all seven days of it — dissolved into nothing.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════ EPILOGUE ══════════ -->
+<div class="epilogue" data-ch>
+  <div style="font-size:2.5rem;margin-bottom:1rem">🥙 🐦 🚫➡️✅</div>
+  <div class="epilogue-title">MISSION ACCOMPLISHED</div>
+  <div class="epilogue-body">
+    Evran logged back in that evening and ate a celebratory döner with three pigeons who had <em>not</em> been employed by Pigeon Entertainment and were therefore innocent bystanders.<br><br>
+    Ignite sent Hydrophilic seventeen voice messages blaming him for the water damage. Hydrophilic responded by saying everyone should stay hydrated. Lapi was already asleep, having said nothing since "done." Whisp had recovered from the chaos and was being genuinely supportive again, in healthy doses. Ana was staring at a new wall.<br><br>
+    Anduin tried to befriend two of the pigeon executives on the way out. One of them is now in the group chat.<br><br>
+    <em>Evran called the next enemy player a moron four minutes after his account was restored.</em>
+  </div>
+  <div class="fin-tag">— END OF OPERATION: FREE EVRAN —</div>
+</div>
+
+<script>
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('vis'); });
+}, { threshold: 0.1 });
+document.querySelectorAll('[data-ch], .epilogue').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>
