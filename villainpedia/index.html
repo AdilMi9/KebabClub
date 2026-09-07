@@ -119,6 +119,11 @@
   .quote p{margin:0 0 8px;font-style:italic;font-size:14px;}
   .quote audio{width:100%;}
 
+  .audio-top{background:var(--bg-soft);color:var(--text);padding:10px 14px;margin:0 0 20px;}
+  .audio-top .lbl{font-family:'IBM Plex Mono', monospace;font-size:10.5px;
+    text-transform:uppercase;letter-spacing:.06em;color:var(--muted);display:block;margin-bottom:6px;}
+  .audio-top audio{width:100%;display:block;}
+
   .edit-link{font-family:'IBM Plex Mono', monospace;font-size:12px;color:var(--accent-teal);text-decoration:none;}
 
   /* ---------- comments ---------- */
@@ -383,6 +388,11 @@ async function renderDetail(id){
         </div>
         ${isAdmin ? `<a class="edit-link" href="index.html?edit=${c.id}">Edit file →</a>` : ''}
       </div>
+      ${c.bio_audio_url ? `
+      <div class="audio-top">
+        <span class="lbl">Audio dossier (summary + full bio)</span>
+        <audio controls src="${c.bio_audio_url}"></audio>
+      </div>` : ''}
       <div class="field-grid">
         ${c.affiliation ? `<div><span class="label">Affiliation</span>${esc(c.affiliation)}</div>` : ''}
         ${c.status ? `<div><span class="label">Status</span>${esc(c.status)}</div>` : ''}
@@ -458,7 +468,8 @@ async function renderDetail(id){
 // ---------- form (new / edit) ----------
 function emptyDraft(){
   return { name:'', aliases:'', summary:'', bio:'', affiliation:'', status:'', abilities:'', tags:'',
-    existingPhotos:[], newPhotos:[], quotes:[{text:'', audioFile:null, existingUrl:null}] };
+    existingPhotos:[], newPhotos:[], quotes:[{text:'', audioFile:null, existingUrl:null}],
+    bioAudioFile:null, bioAudioUrl:null };
 }
 
 async function renderForm(existingId){
@@ -475,9 +486,64 @@ async function renderForm(existingId){
       affiliation: c.affiliation || '', status: c.status || '', abilities: (c.abilities||[]).join(', '),
       tags: (c.tags||[]).join(', '),
       existingPhotos: c.photos || [], newPhotos: [],
-      quotes: (c.quotes && c.quotes.length) ? c.quotes.map(q=>({text:q.text, audioFile:null, existingUrl:q.audio_url||null})) : [{text:'', audioFile:null, existingUrl:null}]
+      quotes: (c.quotes && c.quotes.length) ? c.quotes.map(q=>({text:q.text, audioFile:null, existingUrl:q.audio_url||null})) : [{text:'', audioFile:null, existingUrl:null}],
+      bioAudioFile:null, bioAudioUrl: c.bio_audio_url || null
     };
   }
+
+	function renderBioAudioField(){
+	  const file = draft.bioAudioFile;
+	  const existingUrl = draft.bioAudioUrl;
+	  const status = file ? file.name : (existingUrl ? 'has audio' : 'no audio');
+	  return `
+		<div class="qtools">
+		  <button type="button" class="ghost recordBtn" id="bioAudioRecordBtn">🎙️ Record audio</button>
+		  <label class="ghost" style="cursor:pointer;">📎 Upload audio<input type="file" accept="audio/*" id="bioAudioFileInput" style="display:none;"></label>
+		  <span class="who audioStatus">${status}</span>
+		  ${(file || existingUrl) ? `<button type="button" class="ghost" id="bioAudioRemoveBtn">Remove audio</button>` : ''}
+		</div>
+	  `;
+	}
+
+	function refreshBioAudioField(){
+	  document.getElementById('bioAudioRow').innerHTML = renderBioAudioField();
+	  bindBioAudioFieldEvents();
+	}
+
+	function bindBioAudioFieldEvents(){
+	  const container = document.getElementById('bioAudioRow');
+	  container.querySelector('#bioAudioFileInput').addEventListener('change', e=>{
+		if(e.target.files[0]){
+		  draft.bioAudioFile = e.target.files[0];
+		  refreshBioAudioField();
+		}
+	  });
+	  const recBtn = container.querySelector('#bioAudioRecordBtn');
+	  let recorder=null, chunks=[], stream=null;
+	  recBtn.addEventListener('click', async ()=>{
+		if(recorder && recorder.state === 'recording'){ recorder.stop(); return; }
+		try{ stream = await navigator.mediaDevices.getUserMedia({audio:true}); }
+		catch(e){ document.getElementById('formHint').textContent = "Couldn't access microphone."; return; }
+		chunks=[];
+		recorder = new MediaRecorder(stream);
+		recorder.ondataavailable = e=>chunks.push(e.data);
+		recorder.onstop = ()=>{
+		  const blob = new Blob(chunks, {type:'audio/webm'});
+		  const file = new File([blob], `voice-bio-${Date.now()}.webm`, {type:'audio/webm'});
+		  draft.bioAudioFile = file;
+		  stream.getTracks().forEach(t=>t.stop());
+		  refreshBioAudioField();
+		};
+		recorder.start();
+		recBtn.classList.add('recording'); recBtn.textContent = '⏹ Stop';
+	  });
+	  const removeBtn = container.querySelector('#bioAudioRemoveBtn');
+	  if(removeBtn) removeBtn.addEventListener('click', ()=>{
+		draft.bioAudioFile = null;
+		draft.bioAudioUrl = null;
+		refreshBioAudioField();
+	  });
+	}
 
 	function renderQuoteRows(){
 	  return draft.quotes.map((q,i)=>`
@@ -504,6 +570,10 @@ async function renderForm(existingId){
     <a class="back-link" href="index.html">← back to files</a>
     <div class="form-panel">
       <h2>${existingId ? 'Edit file' : 'New file'}</h2>
+      <div class="f-row">
+        <label>Audio dossier (summary + full bio, one recording)</label>
+        <div id="bioAudioRow">${renderBioAudioField()}</div>
+      </div>
       <div class="f-row"><label>Name</label><input type="text" id="fName" value="${esc(draft.name)}"></div>
       <div class="f-row"><label>Aliases (comma separated)</label><input type="text" id="fAliases" value="${esc(draft.aliases)}"></div>
       <div class="f-row"><label>Summary (short, shown in bold)</label><textarea id="fSummary">${esc(draft.summary)}</textarea></div>
@@ -579,6 +649,7 @@ async function renderForm(existingId){
     });
   }
   bindQuoteRowEvents();
+  bindBioAudioFieldEvents();
 
   document.getElementById('addQuoteBtn').addEventListener('click', ()=>{
     draft.quotes.push({text:'', audioFile:null, existingUrl:null});
@@ -616,6 +687,9 @@ async function renderForm(existingId){
       }
       const finalPhotos = [...draft.existingPhotos, ...newPhotoUrls];
 
+      let bioAudioUrl = draft.bioAudioUrl;
+      if(draft.bioAudioFile) bioAudioUrl = await uploadToBucket(AUDIO_BUCKET, draft.bioAudioFile);
+
       const finalQuotes = [];
       for(const q of draft.quotes){
         if(!q.text.trim()) continue;
@@ -629,6 +703,7 @@ async function renderForm(existingId){
         aliases: document.getElementById('fAliases').value.split(',').map(s=>s.trim()).filter(Boolean),
         summary: document.getElementById('fSummary').value.trim(),
         bio: document.getElementById('fBio').value.trim(),
+        bio_audio_url: bioAudioUrl,
         affiliation: document.getElementById('fAffiliation').value.trim(),
         status: document.getElementById('fStatus').value.trim(),
         abilities: document.getElementById('fAbilities').value.split(',').map(s=>s.trim()).filter(Boolean),
