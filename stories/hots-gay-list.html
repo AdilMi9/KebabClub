@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heroes of the Storm: The Gay List</title>
+<style>
+  :root {
+    --bg: #0f1115;
+    --card: #1a1d24;
+    --accent: #ffb347;
+    --accent2: #7dd3fc;
+    --text: #e8e8e8;
+    --muted: #9aa0aa;
+    --border: #2a2e37;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: radial-gradient(circle at top, #1c2029, #0f1115 60%);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    padding: 40px 20px 80px;
+  }
+  header {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 40px;
+  }
+  h1 {
+    font-size: 2.4rem;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  header p {
+    color: var(--muted);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+  .search-wrap {
+    max-width: 500px;
+    margin: 0 auto 40px;
+  }
+  #search {
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 1rem;
+  }
+  #search:focus {
+    outline: none;
+    border-color: var(--accent2);
+  }
+  .grid {
+    max-width: 900px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+  }
+  .entry {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    transition: transform 0.15s ease, border-color 0.15s ease;
+  }
+  .entry:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent2);
+  }
+  .hero {
+    font-weight: 700;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 4px;
+    font-size: 1.05rem;
+  }
+  .joke {
+    color: var(--text);
+    line-height: 1.4;
+    font-size: 0.95rem;
+  }
+  .joke .word {
+    color: var(--accent2);
+    font-weight: 600;
+  }
+  .count {
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+  }
+  .hidden { display: none; }
+  footer {
+    text-align: center;
+    margin-top: 60px;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Heroes of the Storm: The Gay List</h1>
+  <p>One hero, one crime against good gameplay. Search below to find your particular flavor of gay.</p>
+</header>
+
+<div class="search-wrap">
+  <input type="text" id="search" placeholder="Search a hero or keyword...">
+</div>
+
+<div class="count" id="count"></div>
+
+<div class="grid" id="grid"></div>
+
+<footer>Made with love, spite, and 9000 hours in Hero League.</footer>
+
+<script>
+const WORD = "gay";
+
+const data = [
+["Abathur","Sitting at the core and not soaking multiple lanes is"],
+["Alarak","Deadly Charging into the heart of the red team is"],
+["Alexstrasza","Casting Abundance only to heal yourself is"],
+["Ana","Picking Trait talent at level 1 is"],
+["Anduin","Using Leap of Faith to pull an ally two millimeters away is"],
+["Anub'arak","Casting Cocoon on a dying enemy is"],
+["Artanis","Swapping an already focused enemy is"],
+["Arthas","Using Howling Blast on minions is"],
+["Auriel","Forgetting to switch batteries is"],
+["Azmodan","Not completing baseline quest by 15-minute mark is"],
+["Blaze","Sitting inside the Bunker during the entirety of a teamfight is"],
+["Brightwing","Wasting your Z to save a suiciding dumbass is"],
+["The Butcher","Relying only on hero kills for meat is"],
+["Cassia","Fending minions is"],
+["Chen","Using Wandering Keg to displace every enemy in sight is"],
+["Cho","Thinking you are invincible is"],
+["Chromie","Using Time Traps to mess with teammates is"],
+["D.Va","Using Self Destruct to damage structures is"],
+["Deckard","Casting the sleep ult without pinging beforehand is"],
+["Dehaka","Using Brushstalker to travel from mid lane to top lane is"],
+["Deathwing","Letting the enemy Deathwing complete The Hour of Twilight is"],
+["Diablo","Screwing 86 percent of ally skillshots is"],
+["E.T.C.","Casting Face Melt right after Powerslide is"],
+["Falstad","Not being able to fly all across the map is"],
+["Fenix","Picking Purification Salvo into Octo-Grab is"],
+["Gall","Forgetting to press D is"],
+["Garrosh","Accidentally throwing minions is"],
+["Gazlowe","Picking Robo-Goblin into a wombo-combo"],
+["Genji","Mistaking yourself with a plot-armored anime antagonist is"],
+["Greymane","Using Silver Bullet as a finisher is"],
+["Gul'dan","Rain of Destruction is"],
+["Hanzo","Taking more than 2 seconds to fire Storm Bow is"],
+["Hogger","Not being able to predict Hogg Wild's general trajectory is"],
+["Illidan","Being blind AND deaf is"],
+["Imperius","Using Wrath of Angiris to help heroes escape judgment is"],
+["Jaina","Thinking Ring of Frost roots enemies inside it is"],
+["Johanna","Being the subject of CC porn is"],
+["Junkrat","Picking I Hate Waiting at level 20 is"],
+["Kael'thas","The fact that right-clicking cancels Pyroblast is"],
+["Kel'Thuzad","Having that many ability buttons is"],
+["Kerrigan","Running out of mana after a single rotation is"],
+["Kharazim","Picking Insight to take camps is"],
+["Leoric","Trading Entomb for March of the Black King is"],
+["Li Li","Ninja-running after being hit is"],
+["Li-Ming","Using Calamity to make life hell for the friendly healer is"],
+["The Lost Vikings","Clumping all 3 Vikings before level 16 is"],
+["Lt. Morales","Using Displacement Grenade to spread a neat minion wave is"],
+["Lúcio","Using Q like E in the previous sentence is"],
+["Lunara","Running ahead of your wisp is"],
+["Maiev","Using Containment Disk on a focused enemy is"],
+["Mal'Ganis","Having Necrotic Embrace Armor nerfed from 25 Armor to 15 spell armor is"],
+["Malfurion","Having a shirtless brother is"],
+["Malthael","Having no CC as a bruiser is"],
+["Medivh","Not having teammates who take portals is"],
+["Mei","Speaking random Chinese is"],
+["Mephisto","Mistaking E as an escape button is"],
+["Muradin","Displacing trapped enemies with Hay Maker is"],
+["Murky","Picking the bribe talent on two-lane maps is"],
+["Nazeebo","Not cancelling a poor Zombie Wall early is"],
+["Nova","Solo-laning with a gank hero is"],
+["Orphea","Having that much purple in your character design is"],
+["Probius","Getting supply blocked is"],
+["Qhira","Whoever designed her is"],
+["Ragnaros","Casting Lava Wave on an attended lane is"],
+["Raynor","Picking Hyperion on maps with mobile objectives is"],
+["Rehgar","Casting Ancestral Healing too late is"],
+["Rexxar","Taking camps instead of soaking is"],
+["Samuro","Not being nerfed is"],
+["Sgt. Hammer","Picking Sgt. Hammer is"],
+["Sonya","Spending 94% of your time in camps is"],
+["Stitches","Picking Putrid Bile is"],
+["Stukov","Using Lurking Arm to tickle minions is"],
+["Sylvanas","Trading her baseline Trait with Possession is"],
+["Tassadar","Never trying W build is"],
+["Thrall","Having a thousand quests is"],
+["Tracer","Overwatch is"],
+["Tychus","Thinking Minigun works on minions is"],
+["Tyrande","Having no peel as a tank is"],
+["Tyrael","Having such a long cooldown on such a mediocre healing ult is"],
+["Uther","Refusing to die after being killed is"],
+["Valeera","Playing Splinter Cell in Heroes of the Storm is"],
+["Valla","Using Rain of Vengeance as poke damage is"],
+["Varian","Picking Twinblades of Fury is"],
+["Whitemane","Not getting a boner while playing as her is"],
+["Xul","Taking camps with a splitpusher is"],
+["Yrel","Grunting and screaming with every single ability is"],
+["Zagara","Devouring Maw unannounced it"],
+["Zarya","Picking Expulsion zone into Moshpit is"],
+["Zeratul","Void Prison just because you can is"],
+["Zul'jin","Losing stacks when dying is"]
+];
+
+const grid = document.getElementById('grid');
+const search = document.getElementById('search');
+const count = document.getElementById('count');
+
+function render(filter) {
+  grid.innerHTML = '';
+  let shown = 0;
+  const f = filter.trim().toLowerCase();
+  data.forEach(([hero, joke]) => {
+    const full = (hero + ' ' + joke).toLowerCase();
+    if (f && !full.includes(f)) return;
+    shown++;
+    const div = document.createElement('div');
+    div.className = 'entry';
+    div.innerHTML = `<span class="hero">${hero}</span><span class="joke">${joke} <span class="word">${WORD}</span>.</span>`;
+    grid.appendChild(div);
+  });
+  count.textContent = shown + ' of ' + data.length + ' entries';
+}
+
+search.addEventListener('input', e => render(e.target.value));
+render('');
+</script>
+
+</body>
+</html>
